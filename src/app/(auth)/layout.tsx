@@ -13,7 +13,7 @@ function layout({ children }: { children: ReactNode }) {
         
         </div>
       </nav>
-      <main className="flex w-full flex-grow  h-full items-center justify-center"> {children}</main>
+      <main className=""> {children}</main>
     </div>
   );
 }
