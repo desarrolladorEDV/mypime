@@ -30,13 +30,13 @@ import Link from "next/link";
 // Componente principal Home
 export default function Home() {
   return (
-    <div className="container pt-4">
+    <div className="flex-1 space-y-4 p-8 pt-6 border rounded ">
       {/* Suspense para manejar la carga asincrónica de las estadísticas */}
       <Suspense fallback={<StatsCards loading={true} />}>
         <CardStatsWrapper />
       </Suspense>
       <Separator className="my-6" />
-      <h2 className="text-4xl font-bold col-span-2">Tus formularios</h2>
+      <h2 className="text-3xl font-bold tracking-tight">Tus formularios</h2>
       <Separator className="my-6" />
       <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <CreateFormBtn />
@@ -70,12 +70,12 @@ function StatsCards(props: StatsCardProps) {
   const { data, loading } = props;
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="mt-2 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
         title="Total visitas"
         icon={<BookText className="h-4 w-4" />}
         helperText="Todas las visitas"
-        value={data?.visits.toLocaleString() || ""}
+        value={data?.visits?.toLocaleString() || ""}
         loading={loading}
         className=""
       />
@@ -84,7 +84,7 @@ function StatsCards(props: StatsCardProps) {
         title="Total envíos"
         icon={<CirclePlus className="h-4 w-4" />}
         helperText="Todos los envíos"
-        value={data?.submissions.toLocaleString() || ""}
+        value={data?.submissions?.toLocaleString() || ""}
         loading={loading}
         className=""
       />
@@ -93,7 +93,7 @@ function StatsCards(props: StatsCardProps) {
         title="Tasa de envíos"
         icon={<MousePointerClick className="h-4 w-4" />}
         helperText="Vistas en envíos de formularios"
-        value={data?.submissionRate.toLocaleString() + "%" || ""}
+        value={data?.submissionRate?.toLocaleString() + "%" || ""}
         loading={loading}
         className=""
       />
@@ -102,7 +102,7 @@ function StatsCards(props: StatsCardProps) {
         title="Porcentaje de rebotes"
         icon={<CirclePlus className="h-4 w-4" />}
         helperText="Visitas que te dejan sin interactuar"
-        value={data?.submissionRate.toLocaleString() + "%" || ""}
+        value={data?.submissionRate?.toLocaleString() + "%" || ""}
         loading={loading}
         className=""
       />
@@ -184,7 +184,7 @@ function FormCard({ form }: { form: Form }) {
           {form.published && (
             <span className="flex items-center gap-2 text-sm">
               <View className="text-muted-foreground h-5 w-5" />
-              <span>{form.visits.toLocaleString()}</span>
+              <span>{form.visits?.toLocaleString()}</span>
               <SendHorizontal className="text-muted-foreground h-5 w-5" />
               <span>{form.submissions.toLocaleString()}</span>
             </span>

@@ -5,6 +5,7 @@
 import { CheckboxFieldFormElement } from "./fields/CheckboxField";
 import { DateFíeldFormElement } from "./fields/DateFíeld";
 import { NumberFieldFormElement } from "./fields/NumberField";
+import { NumericSelectFieldFormElement } from "./fields/NumericSelectField";
 import { ParagraphFieldFormElement } from "./fields/ParagraphField";
 import { SelectFieldFormElement } from "./fields/SelectField";
 import { SeparatorFieldFormElement } from "./fields/SeparatorField";
@@ -25,7 +26,8 @@ export type ElementsType =
   | "TextAreaField"
   | "DateFíeld"
   | "SelectField"
-  | "CheckboxField";
+  | "CheckboxField"
+  | "NumericSelectField";
   
   export type SubmitFunction = (key: string, value: string) => void;
 
@@ -91,6 +93,7 @@ export type FormElement = {
 export type FormElementInstance = {
   id: string;
   type: ElementsType;
+  value?: number; // Añadir la propiedad value
   extraAttributes?: Record<string, any>;
 };
 
@@ -116,4 +119,5 @@ export const FormElements: FormElementsType = {
   DateFíeld: DateFíeldFormElement,
   SelectField: SelectFieldFormElement,
   CheckboxField: CheckboxFieldFormElement,
+  NumericSelectField: NumericSelectFieldFormElement,
 };

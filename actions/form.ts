@@ -165,23 +165,32 @@ export async function GetFormContentByUrl(formUrl: string) {
 }
 
 export async function SubmitForm(formUrl: string, content: string) {
-  
-  return await prisma.form.update({
-    data:{
-      submissions: {
-        increment: 1
+  try {
+    // Parsear el contenido JSON para extraer el campo total
+    const parsedContent = JSON.parse(content);
+    const { total, ...otherFields } = parsedContent;
+
+    return await prisma.form.update({
+      data: {
+        submissions: {
+          increment: 1,
+        },
+        FormSubmissions: {
+          create: {
+            content: JSON.stringify(otherFields), // Guardar el resto del contenido
+            total: parseFloat(total), // Guardar el campo total
+          },
+        },
       },
-      FormSubmissions:{
-        create:{
-          content
-        }
-      }
-    },
-    where: {
-      shareURL: formUrl,
-      published: true
-    }
-  })
+      where: {
+        shareURL: formUrl,
+        published: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error al enviar el formulario:", error);
+    throw new Error("Error al enviar el formulario");
+  }
 }
 
 export async function GetFormWithSubmissions (id: number) {

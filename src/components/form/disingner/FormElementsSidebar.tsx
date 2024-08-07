@@ -24,6 +24,7 @@ function FormElementsSidebar() {
         place-self-start">
           Elementos de formulario
         </p>
+        <SidebarBtnElement formElement={FormElements.NumericSelectField} />
         <SidebarBtnElement formElement={FormElements.TextField} />
         <SidebarBtnElement formElement={FormElements.NumberField} />
         <SidebarBtnElement formElement={FormElements.TextAreaField} />

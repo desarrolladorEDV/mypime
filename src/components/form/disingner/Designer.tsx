@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import DisignerSidebar from "./DisignerSidebar";
 import { useDndMonitor, useDroppable, DragEndEvent, useDraggable } from "@dnd-kit/core";
-import { ElementType, useState } from "react";
+import { ElementType, useEffect, useState } from "react";
 import { ElementsType, FormElement, FormElementInstance, FormElements } from "./FormElemets";
 import useDesinger from "../hooks/useDesigner";
 import { idGenerator } from "@/lib/idGenerator";
@@ -23,6 +23,19 @@ function Designer() {
       isDesignerDropArea: true,
     },
   });
+
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const sum = elements.reduce((acc, element) => {
+      if (element.type === "NumericSelectField" && element.value !== undefined) {
+        return acc + element.value;
+      }
+      return acc;
+    }, 0);
+    setTotal(sum);
+  }, [elements]);
+  
 
   console.log(elements);
 
@@ -63,7 +76,7 @@ function Designer() {
        over.data?.current?.isBottomHalfDesignerElement;
 
       const isDroppingOverDesignerElement= 
-      isDroppingOverDesignerElementTopHalf |
+      isDroppingOverDesignerElementTopHalf ||
       isDroppingOverDesignerElementBottomHalf;
 
       const droppingSidebarBtnOverDesignerElement=
@@ -154,6 +167,9 @@ function Designer() {
                 // Para cada elemento del diseño, renderiza su componente correspondiente
                 <DesignerElementWrapper key={element.id} element={element} />
               ))}
+               <div className="p-4 w-full">
+          <p className="text-xl">Total Sum: {total}</p>
+        </div>
             </div>
           )}
         </div>

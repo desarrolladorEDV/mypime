@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "../../ui/button";
-import { ScanEye } from "lucide-react";
-import useDesigner from "../hooks/useDesigner";
+"use client";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { FormElements } from "./FormElemets";
+ // Asume que este componente ya existe y maneja la lógica de edición
+import { Button } from "@/components/ui/button";
+import FormSubmitComponent from "../forms/FormSubmitComponent";
+import { FormElements } from "../disingner/FormElemets";
+import useDesigner from "../hooks/useDesigner";
+import { FilePenLine } from "lucide-react";
 
-function PreviewDialogBtn() {
-  const { elements } = useDesigner();
-  const [total, setTotal] = useState<number>(0);
-
-  useEffect(() => {
-    const sum = elements.reduce((acc, element) => {
-      if (element.type === "NumericSelectField" && element.value !== undefined) {
-        return acc + element.value;
-      }
-      return acc;
-    }, 0);
-    setTotal(sum);
-  }, [elements]);
+function EditButton() {
+    const { elements } = useDesigner();
+    const [total, setTotal] = useState<number>(0);
+  
+  const [open, setOpen] = useState(false);
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant={"outline"} className="gap-2">
-          <ScanEye />
+          <FilePenLine />
           Preview
         </Button>
       </DialogTrigger>
@@ -52,4 +47,4 @@ function PreviewDialogBtn() {
   );
 }
 
-export default PreviewDialogBtn;
+export default EditButton;

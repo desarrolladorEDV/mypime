@@ -18,29 +18,28 @@ datasource db {
 
 // Modelo para los formularios
 model Form {
-  id          Int      @id @default(autoincrement()) // Identificador único con autoincremento
-  userId      String // Identificador del usuario
-  createdAt   DateTime @default(now()) // Fecha de creación con valor por defecto del momento actual
-  published   Boolean  @default(false) // Indicador de si el formulario está publicado o no, por defecto false
-  name        String // Nombre del formulario
-  description String   @default("") // Descripción del formulario, por defecto una cadena vacía
-  content     String   @default("[]") // Contenido del formulario en formato JSON, por defecto un array vacío
+  id          Int      @id @default(autoincrement())
+  userId      String 
+  createdAt   DateTime @default(now()) 
+  published   Boolean  @default(false) 
+  name        String 
+  description String   @default("")
+  content     String   @default("[]") 
 
-  visits      Int @default(0) // Número de visitas al formulario, por defecto 0
-  submissions Int @default(0) // Número de envíos del formulario, por defecto 0
+  visits      Int @default(0) 
+  submissions Int @default(0) 
 
-  shareURL        String           @unique @default(uuid())  // URL para compartir el formulario, por defecto un UUID
-  FormSubmissions FormSubmissions[] // Relación uno a muchos con el modelo FormSubmissions
+  shareURL        String           @unique @default(uuid())  
+  FormSubmissions FormSubmission[] 
 
-  @@unique([name,userId])
+  @@unique([name, userId])
 }
 
-// Modelo para los envíos de formularios
-model FormSubmissions {
-  id        Int      @id @default(autoincrement()) // Identificador único con autoincremento
-  createdAt DateTime @default(now()) // Fecha de creación con valor por defecto del momento actual
-  formId    Int // Identificador del formulario relacionado
-  form      Form     @relation(fields: [formId], references: [id]) // Relación con el modelo Form
-
-  content String // Contenido del envío del formulario
+model FormSubmission {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) 
+  formId    Int 
+  form      Form     @relation(fields: [formId], references: [id]) 
+  total     Float    // Asegúrate de que este campo está definido correctamente
+  content   String
 }

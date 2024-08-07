@@ -6,7 +6,7 @@ import {
 import VisitBtn from "@/components/form/forms/VisitBtn";
 import FormLinkShare from "@/components/form/forms/FormLinkShare";
 import { StatsCard } from "../../page";
-import { BookText, CirclePlus, MousePointerClick } from "lucide-react";
+import { BookText, CirclePlus, FilePenLine, MousePointerClick } from "lucide-react";
 import {
   ElementsType,
   FormElementInstance,
@@ -23,6 +23,7 @@ import { formatDistance } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
+import EditButton from "@/components/form/edit/EditButton";
 
 async function FormDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -138,6 +139,7 @@ async function SubmissionsTable({ id }: { id: number }) {
       case "TextAreaField":
       case "SelectField":
       case "CheckboxField":
+      case "NumericSelectField":
         colums.push({
           id: element.id,
           label: element.extraAttributes?.label,
@@ -173,7 +175,7 @@ async function SubmissionsTable({ id }: { id: number }) {
               ))}
 
               <TableHead className="text-muted-foreground text-right uppercase">
-                Enviado hace 
+                Enviado hace
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -181,16 +183,19 @@ async function SubmissionsTable({ id }: { id: number }) {
             {rows.map((row, index) => (
               <TableRow key={index}>
                 {colums.map((column) => (
-                  <RowCell 
-                  key={column.id} 
-                  type={column.type}
-                  value={row[column.id]}
-                  />     
+                  <RowCell
+                    key={column.id}
+                    type={column.type}
+                    value={row[column.id]}
+                  />
                 ))}
                 <TableCell className="text-muted-foreground text-right">
-                  {formatDistance(row.submittedAt, new Date(),{
+                  {formatDistance(row.submittedAt, new Date(), {
                     addSuffix: true
                   })}
+                </TableCell>
+                <TableCell>
+                  <EditButton   />
                 </TableCell>
               </TableRow>
             ))}
@@ -201,7 +206,7 @@ async function SubmissionsTable({ id }: { id: number }) {
   );
 }
 
-function RowCell({type, value}: {type: ElementsType, value: string}) {
+function RowCell({ type, value }: { type: ElementsType, value: string }) {
   let node: ReactNode = value;
 
   switch (type) {
@@ -210,12 +215,12 @@ function RowCell({type, value}: {type: ElementsType, value: string}) {
       const date = new Date(value);
       node = <Badge variant="outline">{format(date, "dd/MM/yyyy")}</Badge>;
       break;
-      case "CheckboxField":
-        const cheked = value === "true" ? true : false;
-        node= <Checkbox checked={cheked}  disabled/>;
-        break;
-        default:
-          break;
+    case "CheckboxField":
+      const cheked = value === "true" ? true : false;
+      node = <Checkbox checked={cheked} disabled />;
+      break;
+    default:
+      break;
   }
 
   return <TableCell>{node}</TableCell>;

@@ -19,6 +19,10 @@ import {
 import { Overview } from "./components/overview"
 import { RecentSales } from "./components/recent-sales"
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/nextjs"
+import { Suspense } from "react"
+import { GetFormStats } from "../../../actions/form"
+import { StatsCard } from "./formularios/page"
+import { BookText, CirclePlus, MousePointerClick } from "lucide-react"
 
 
 export const metadata: Metadata = {
@@ -29,160 +33,57 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-     <SignedIn>
-          prueba
-        </SignedIn>
-        <SignedOut>
-          <RedirectToSignIn />
-        </SignedOut>
+     
       <div className=" flex-col md:flex justify-center items center border rounded">
-        
+
 
         <div className="flex-1 space-y-4 p-8 pt-6">
-            {/* TITULO DE LA PAGINA */}
+          {/* TITULO DE LA PAGINA */}
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
             <div className="flex items-center space-x-2">
               <Button>Download</Button>
             </div>
           </div>
-            {/* TABS */}
+          {/* TABS */}
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList className="grid w-auto lg:inline-flex md:grid-cols-3 grid-cols-2 gap-4 justify-start h-auto">
               <TabsTrigger value="overview">Home</TabsTrigger>
               <TabsTrigger value="analytics" disabled>
-              Descript. Administracion
+                Descript. Administracion
               </TabsTrigger>
               <TabsTrigger value="reports" disabled>
-              Descript. TH
+                Descript. TH
               </TabsTrigger>
               <TabsTrigger value="notifications" disabled>
-              Descript. Contabilidad y F.
+                Descript. Contabilidad y F.
               </TabsTrigger>
-              
+
               <TabsTrigger value="notifications" disabled>
-              Descript. Operaciones
-              </TabsTrigger>
-              <TabsTrigger value="notifications" disabled>
-              Descript.Innovacion
+                Descript. Operaciones
               </TabsTrigger>
               <TabsTrigger value="notifications" disabled>
-              Descript.Marketing
+                Descript.Innovacion
+              </TabsTrigger>
+              <TabsTrigger value="notifications" disabled>
+                Descript.Marketing
               </TabsTrigger>
 
 
 
             </TabsList>
             <TabsContent value="overview" className="space-y-4">
-                {/* CARDS */}
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {/* CARDS */}
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total Revenue
-                    </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">$45,231.89</div>
-                    <p className="text-xs text-muted-foreground">
-                      +20.1% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Subscriptions
-                    </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+2350</div>
-                    <p className="text-xs text-muted-foreground">
-                      +180.1% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <rect width="20" height="14" x="2" y="5" rx="2" />
-                      <path d="M2 10h20" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+12,234</div>
-                    <p className="text-xs text-muted-foreground">
-                      +19% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Active Now
-                    </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+573</div>
-                    <p className="text-xs text-muted-foreground">
-                      +201 since last hour
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+              {/* CARDS */}
+              {/* CARDS */}
+                {/* Suspense para manejar la carga asincrónica de las estadísticas */}
+                <Suspense fallback={<StatsCards loading={true} />}>
+                  <CardStatsWrapper />
+                </Suspense>
+          
 
               {/* CHARTS Y RECENT SALES */}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                  {/* CHART O GRAFICA */}
+                {/* CHART O GRAFICA */}
                 <Card className="col-span-4">
                   <CardHeader>
                     <CardTitle>Overview</CardTitle>
@@ -192,7 +93,7 @@ export default function Home() {
                   </CardContent>
                 </Card>
 
-                  {/* RECIENT SALES */}
+                {/* RECIENT SALES */}
                 <Card className="col-span-3">
                   <CardHeader>
                     <CardTitle>Recent Sales</CardTitle>
@@ -211,4 +112,61 @@ export default function Home() {
       </div>
     </>
   )
+}
+
+
+async function CardStatsWrapper() {
+  const stats = await GetFormStats();
+
+  return <StatsCards loading={false} data={stats} />;
+}
+
+// Propiedades del componente StatsCard
+interface StatsCardProps {
+  data?: Awaited<ReturnType<typeof GetFormStats>>;
+  loading: boolean;
+}
+
+function StatsCards(props: StatsCardProps) {
+  const { data, loading } = props;
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <StatsCard
+        title="Total visitas"
+        icon={<BookText className="h-4 w-4" />}
+        helperText="Todas las visitas"
+        value={data?.visits?.toLocaleString() || ""}
+        loading={loading}
+        className=""
+      />
+
+      <StatsCard
+        title="Total envíos"
+        icon={<CirclePlus className="h-4 w-4" />}
+        helperText="Todos los envíos"
+        value={data?.submissions?.toLocaleString() || ""}
+        loading={loading}
+        className=""
+      />
+
+      <StatsCard
+        title="Tasa de envíos"
+        icon={<MousePointerClick className="h-4 w-4" />}
+        helperText="Vistas en envíos de formularios"
+        value={data?.submissionRate?.toLocaleString() + "%" || ""}
+        loading={loading}
+        className=""
+      />
+
+      <StatsCard
+        title="Porcentaje de rebotes"
+        icon={<CirclePlus className="h-4 w-4" />}
+        helperText="Visitas que te dejan sin interactuar"
+        value={data?.submissionRate?.toLocaleString() + "%" || ""}
+        loading={loading}
+        className=""
+      />
+    </div>
+  );
 }

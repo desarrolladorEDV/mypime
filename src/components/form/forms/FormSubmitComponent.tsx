@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef, useState, useTransition } from "react";
+import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { FormElementInstance, FormElements } from "../disingner/FormElemets";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
@@ -17,9 +17,24 @@ function FormSubmitComponent({
   const formValues = useRef<{ [key: string]: string }>({});
   const formErrors = useRef<{ [key: string]: boolean }>({});
   const [renderKey, setRenderKey] = useState(new Date().getTime());
+  const [total, setTotal] = useState(0);
 
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  const calculateTotal = useCallback(() => {
+    const sum = content.reduce((acc, element) => {
+      if (element.type === "NumericSelectField" && formValues.current[element.id] !== undefined) {
+        return acc + parseFloat(formValues.current[element.id] || "0");
+      }
+      return acc;
+    }, 0);
+    setTotal(sum);
+  }, [content]);
+
+  useEffect(() => {
+    calculateTotal();
+  }, [content, calculateTotal]);
 
   const validateForm: () => boolean = useCallback(() => {
     for (const field of content) {
@@ -40,7 +55,8 @@ function FormSubmitComponent({
 
   const submitValue = useCallback((key: string, value: string) => {
     formValues.current[key] = value;
-  }, []);
+    calculateTotal();  // Update total when a value is submitted
+  }, [calculateTotal]);
 
   const submitForm = async () => {
     formErrors.current = {};
@@ -56,13 +72,13 @@ function FormSubmitComponent({
     }
 
     try {
-      const jsonContent = JSON.stringify(formValues.current);
+      const jsonContent = JSON.stringify({ ...formValues.current, total });
       await SubmitForm(formUrl, jsonContent);
       setSubmitted(true);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Algo salio mal",
+        description: "Algo salió mal",
         variant: "destructive",
       });
     }
@@ -80,7 +96,7 @@ function FormSubmitComponent({
         >
           <h1 className="text-2xl font-bold">Formulario enviado</h1>
           <p className="text-muted-foreground">
-            Gracias por tu tiempo, tu puedes cerrar esta ventana ahora.
+            Gracias por tu tiempo, tú puedes cerrar esta ventana ahora.
           </p>
         </div>
       </div>
@@ -106,6 +122,9 @@ function FormSubmitComponent({
             />
           );
         })}
+        <div className="mt-4 p-4 rounded-md">
+          <p className="text-lg font-bold">Total: {total}</p>
+        </div>
         <Button
           className="mt-8"
           onClick={() => {
