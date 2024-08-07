@@ -102,7 +102,7 @@ function Formbuilder({ form }: { form: Form }) {
               </Link>
             </Button>
             <Button variant={"link"} asChild>
-              <Link href={`/forms/${form.id}`} className="gap-2">
+              <Link href={`/formularios/forms/${form.id}`} className="gap-2">
                Detalles del formulario
                <ArrowRight/>
              
@@ -117,7 +117,7 @@ function Formbuilder({ form }: { form: Form }) {
 
   return (
     <DndContext sensors={sensors}>
-      <main className="flex flex-col w-full">
+      <main className="flex flex-col w-full h-[100vh]">
         <nav className="flex justify-between border-b-2 p-4 gap-3 items-center">
           <h2 className="truncate font-medium">
             <span className="text-muted-foreground mr-2"> Form</span>

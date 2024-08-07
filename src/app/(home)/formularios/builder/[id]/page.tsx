@@ -1,5 +1,5 @@
 import React from 'react'
-import { GetFormById } from '../../../../../actions/form';
+import { GetFormById } from "../../../../../../actions/form";
 import Formbuilder from '@/components/form/disingner/Formbuilder';
 
 async function BuilderPage({params,}:{params:{id:string}}) {

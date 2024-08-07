@@ -2,8 +2,7 @@ import React, { ReactNode } from "react";
 import {
   GetFormById,
   GetFormWithSubmissions,
-} from "../../../../../actions/form";
-import Formbuilder from "@/components/form/disingner/Formbuilder";
+} from "../../../../../../actions/form";
 import VisitBtn from "@/components/form/forms/VisitBtn";
 import FormLinkShare from "@/components/form/forms/FormLinkShare";
 import { StatsCard } from "../../page";

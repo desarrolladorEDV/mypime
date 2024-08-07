@@ -1,5 +1,5 @@
 
-import { GetFormStats, GetForms } from "../../../actions/form";
+import { GetFormStats, GetForms } from "../../../../actions/form";
 import {
   ArrowRight,
   BookText,
@@ -70,41 +70,41 @@ function StatsCards(props: StatsCardProps) {
   const { data, loading } = props;
 
   return (
-    <div className="w-full pt-8 gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
         title="Total visitas"
-        icon={<BookText className="text-blue-600" />}
+        icon={<BookText className="h-4 w-4" />}
         helperText="Todas las visitas"
         value={data?.visits.toLocaleString() || ""}
         loading={loading}
-        className="shadow-md shadow-blue-600"
+        className=""
       />
 
       <StatsCard
         title="Total envíos"
-        icon={<CirclePlus className="text-yellow-600" />}
+        icon={<CirclePlus className="h-4 w-4" />}
         helperText="Todos los envíos"
         value={data?.submissions.toLocaleString() || ""}
         loading={loading}
-        className="shadow-md shadow-yellow-600"
+        className=""
       />
 
       <StatsCard
         title="Tasa de envíos"
-        icon={<MousePointerClick className="text-green-600" />}
+        icon={<MousePointerClick className="h-4 w-4" />}
         helperText="Vistas en envíos de formularios"
         value={data?.submissionRate.toLocaleString() + "%" || ""}
         loading={loading}
-        className="shadow-md shadow-green-600"
+        className=""
       />
 
       <StatsCard
         title="Porcentaje de rebotes"
-        icon={<CirclePlus className="text-red-600" />}
+        icon={<CirclePlus className="h-4 w-4" />}
         helperText="Visitas que te dejan sin interactuar"
         value={data?.submissionRate.toLocaleString() + "%" || ""}
         loading={loading}
-        className="shadow-md shadow-red-600"
+        className=""
       />
     </div>
   );
@@ -128,8 +128,8 @@ export function StatsCard({
 }) {
   return (
     <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">
           {title}
         </CardTitle>
         {icon}
@@ -143,7 +143,7 @@ export function StatsCard({
           )}
           {!loading && value}
         </div>
-        <p className="text-xs text-muted-foreground pt-1">{helperText}</p>
+        <p className="text-xs text-muted-foreground">{helperText}</p>
       </CardContent>
     </Card>
   );
@@ -197,7 +197,7 @@ function FormCard({ form }: { form: Form }) {
       <CardFooter>
         {form.published && (
           <Button asChild className="w-full mt-2 text-md gap-4">
-            <Link href={`/forms/${form.id}`}>
+            <Link href={`/formularios/forms/${form.id}`}>
               Ver envíos <ArrowRight />
             </Link>
           </Button>
@@ -205,7 +205,7 @@ function FormCard({ form }: { form: Form }) {
 
         {!form.published && (
           <Button asChild className="w-full mt-2 text-md gap-4">
-            <Link href={`/builder/${form.id}`}>
+            <Link href={`/formularios/builder/${form.id}`}>
               Editar formulario  <ClipboardPen />
             </Link>
           </Button>

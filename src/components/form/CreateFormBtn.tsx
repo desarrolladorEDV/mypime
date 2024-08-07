@@ -42,7 +42,7 @@ import { useRouter } from "next/navigation";
             description:"Formulario creado y completado"
         })
         //Envia a ruta para contruir el formulario 
-       router.push(`/builder/${formId}`)
+       router.push(`/formularios/builder/${formId}`)
         
       } catch (error) {
         // Muestra un mensaje de error si algo sale mal
