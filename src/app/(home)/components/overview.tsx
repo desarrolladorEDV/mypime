@@ -4,15 +4,20 @@ import { useState, useEffect } from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { GetFormStats } from "../../../../actions/form";
 
+interface ChartData {
+  name: string;
+  value: number;
+}
+
 export function Overview() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<ChartData[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const stats = await GetFormStats();
         
-        const chartData = [
+        const chartData: ChartData[] = [
           { name: "Visits", value: stats.visits },
           { name: "Submissions", value: stats.submissions },
           { name: "Submission Rate", value: stats.submissionRate },
@@ -31,10 +36,8 @@ export function Overview() {
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>
-       
         <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
         <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-      
         <Bar dataKey="value" fill="#8884d8" radius={[4, 4, 0, 0]} className="fill-primary" />
       </BarChart>
     </ResponsiveContainer>
