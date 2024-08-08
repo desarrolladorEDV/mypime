@@ -209,3 +209,15 @@ export async function GetFormWithSubmissions (id: number) {
   })
 }
 
+export async function getSubmissionsData() {
+  const submissions = await prisma.formSubmission.findMany({
+    select: {
+      createdAt: true,
+      total: true,
+    },
+  });
+
+  return submissions;
+}
+
+

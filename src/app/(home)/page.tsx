@@ -163,7 +163,7 @@ function StatsCards(props: StatsCardProps) {
         title="Porcentaje de rebotes"
         icon={<CirclePlus className="h-4 w-4" />}
         helperText="Visitas que te dejan sin interactuar"
-        value={data?.submissionRate?.toLocaleString() + "%" || ""}
+        value={data?.bounceRate?.toLocaleString() + "%" || ""}
         loading={loading}
         className=""
       />

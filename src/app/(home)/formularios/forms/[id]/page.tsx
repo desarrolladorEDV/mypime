@@ -24,6 +24,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import EditButton from "@/components/form/edit/EditButton";
+import { Araña } from "@/components/Araña";
+
 
 async function FormDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -124,7 +126,7 @@ async function SubmissionsTable({ id }: { id: number }) {
 
   const formElements = JSON.parse(form.content) as FormElementInstance[];
 
-  const colums: {
+  const columns: {
     id: string;
     label: string;
     required: boolean;
@@ -140,7 +142,7 @@ async function SubmissionsTable({ id }: { id: number }) {
       case "SelectField":
       case "CheckboxField":
       case "NumericSelectField":
-        colums.push({
+        columns.push({
           id: element.id,
           label: element.extraAttributes?.label,
           required: element.extraAttributes?.required,
@@ -159,16 +161,21 @@ async function SubmissionsTable({ id }: { id: number }) {
       ...content,
       submittedAt: submission.createdAt,
     });
-  })
+  });
+  
+  
 
   return (
     <>
-      <h1 className="text-2xl font-bold my-4"> Enviados</h1>
+    <div className="flex justify-between">
+ <h1 className="text-2xl font-bold my-4"> Enviados</h1>
+    </div>
+     
       <div className="rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
-              {colums.map((column) => (
+              {columns.map((column) => (
                 <TableHead key={column.id} className="uppercase">
                   {column.label}
                 </TableHead>
@@ -177,12 +184,13 @@ async function SubmissionsTable({ id }: { id: number }) {
               <TableHead className="text-muted-foreground text-right uppercase">
                 Enviado hace
               </TableHead>
+              <TableHead className="uppercase">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.map((row, index) => (
               <TableRow key={index}>
-                {colums.map((column) => (
+                {columns.map((column) => (
                   <RowCell
                     key={column.id}
                     type={column.type}
@@ -195,16 +203,24 @@ async function SubmissionsTable({ id }: { id: number }) {
                   })}
                 </TableCell>
                 <TableCell>
-                  <EditButton   />
+                  {/*<EditButton
+                    submission={row}
+                    columns={columns}
+                    formUrl={form.shareURL}
+                  />*/}
+                
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      <Araña/>
     </>
   );
 }
+
 
 function RowCell({ type, value }: { type: ElementsType, value: string }) {
   let node: ReactNode = value;

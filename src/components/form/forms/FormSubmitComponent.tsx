@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { FormElementInstance, FormElements } from "../disingner/FormElemets";
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,13 @@ import { SubmitForm } from "../../../../actions/form";
 function FormSubmitComponent({
   formUrl,
   content,
+  initialValues = {},
+  onClose,
 }: {
   content: FormElementInstance[];
   formUrl: string;
+  initialValues?: { [key: string]: string };
+  onClose?: () => void;
 }) {
   const formValues = useRef<{ [key: string]: string }>({});
   const formErrors = useRef<{ [key: string]: boolean }>({});
@@ -21,6 +24,11 @@ function FormSubmitComponent({
 
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    formValues.current = { ...initialValues };
+    calculateTotal();
+  }, [initialValues]);
 
   const calculateTotal = useCallback(() => {
     const sum = content.reduce((acc, element) => {
@@ -75,6 +83,7 @@ function FormSubmitComponent({
       const jsonContent = JSON.stringify({ ...formValues.current, total });
       await SubmitForm(formUrl, jsonContent);
       setSubmitted(true);
+      if (onClose) onClose();
     } catch (error) {
       toast({
         title: "Error",

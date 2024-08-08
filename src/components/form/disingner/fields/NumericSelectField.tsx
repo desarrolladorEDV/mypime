@@ -266,8 +266,8 @@ function DesignerComponent({
   elementInstance: FormElementInstance;
 }) {
   const element = elementInstance as CustomInstance;
-  const { label, helperText, required, placeHolder } = element.extraAttributes;
-  return (
+  const { label, helperText, required, placeHolder, options = [] } = element.extraAttributes;
+return (
     <div className="flex flex-col gap-2 w-full">
       <Label className="font-medium text-sm">
         {element.extraAttributes.label}
@@ -305,7 +305,7 @@ function FormComponent({
     setError(isInvalid === true);
   }, [isInvalid]);
 
-  const { label, helperText, required, placeHolder, options } = element.extraAttributes;
+  const { label, helperText, required, placeHolder, options = [] } = element.extraAttributes; // Default to empty array
 
   const handleValueChange = (value: string) => {
     setValue(value);
