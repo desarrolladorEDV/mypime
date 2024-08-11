@@ -128,6 +128,7 @@ function FormSubmitComponent({
               submitValue={submitValue}
               isInvalid={formErrors.current[element.id]}
               defaultValue={formValues.current[element.id]}
+              options={element.extraAttributes.options} 
             />
           );
         })}

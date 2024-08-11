@@ -34,7 +34,7 @@ const extraAttributes = {
   helperText: "Helper text",
   required: false,
   placeHolder: "Escriba aqui...",
-  options: [],
+  options: [] as string[],
 
 };
 
@@ -324,7 +324,15 @@ function FormComponent({
     setError(isInvalid === true);
   }, [isInvalid]);
 
-  const { label, helperText, required, placeHolder, options } = element.extraAttributes;
+  const { label, helperText, required, placeHolder, options  = [] } = element.extraAttributes;
+  
+  // Ensure that the current value is included in the options array
+  useEffect(() => {
+    if (defaultValue && !options.includes(defaultValue)) {
+      (options as string[]).unshift(defaultValue);
+    }
+  }, [defaultValue, options]);
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label className={cn(error && "text-red-500")}>
@@ -332,6 +340,7 @@ function FormComponent({
         {element.extraAttributes.required && "*"}
       </Label>
       <Select
+       value={value}
       defaultValue={value}
         onValueChange={(value) => {
           setValue(value);
@@ -341,10 +350,11 @@ function FormComponent({
           submitValue(element.id, value);
         }}>
         <SelectTrigger className={cn("w-full", error && "border-red-500")}>
-          <SelectValue placeholder={placeHolder} />
+        <SelectValue>{value || placeHolder}</SelectValue> {/* Display the current value or the placeholder */}
+
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
+          {(options as string[]).map((option) => (
             <SelectItem key={option} value={option}>
               {option}
             </SelectItem>

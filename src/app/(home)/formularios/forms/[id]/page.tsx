@@ -203,11 +203,9 @@ async function SubmissionsTable({ id }: { id: number }) {
                   })}
                 </TableCell>
                 <TableCell>
-                  {/*<EditButton
-                    submission={row}
-                    columns={columns}
-                    formUrl={form.shareURL}
-                  />*/}
+                  <EditButton
+                   rowData={row} columns={columns} 
+                  />
                 
                 </TableCell>
               </TableRow>
