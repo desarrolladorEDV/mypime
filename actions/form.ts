@@ -166,10 +166,11 @@ export async function GetFormContentByUrl(formUrl: string) {
 
 export async function SubmitForm(formUrl: string, content: string) {
   try {
-    // Parsear el contenido JSON para extraer el campo total
+    // Parsear el contenido JSON
     const parsedContent = JSON.parse(content);
     const { total, ...otherFields } = parsedContent;
 
+    // Guardar las opciones del SelectField y otros campos
     return await prisma.form.update({
       data: {
         submissions: {
@@ -177,7 +178,7 @@ export async function SubmitForm(formUrl: string, content: string) {
         },
         FormSubmissions: {
           create: {
-            content: JSON.stringify(otherFields), // Guardar el resto del contenido
+            content: JSON.stringify(parsedContent), // Guardar todo el contenido
             total: parseFloat(total), // Guardar el campo total
           },
         },
@@ -192,6 +193,7 @@ export async function SubmitForm(formUrl: string, content: string) {
     throw new Error("Error al enviar el formulario");
   }
 }
+
 
 export async function GetFormWithSubmissions (id: number) {
   const user = await currentUser();
@@ -219,5 +221,7 @@ export async function getSubmissionsData() {
 
   return submissions;
 }
+
+
 
 

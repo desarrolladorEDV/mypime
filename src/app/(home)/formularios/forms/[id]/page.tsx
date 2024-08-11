@@ -23,8 +23,9 @@ import { formatDistance } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
-import EditButton from "@/components/form/edit/EditButton";
+//import EditButton from "@/components/form/accionestable/EditButton";
 import { Araña } from "@/components/Araña";
+import { EditButtonWithModal } from "@/components/form/accionestable/EditButton";
 
 
 async function FormDetailPage({ params }: { params: { id: string } }) {
@@ -124,7 +125,8 @@ async function SubmissionsTable({ id }: { id: number }) {
     throw new Error("Form no encontrado");
   }
 
-  const formElements = JSON.parse(form.content) as FormElementInstance[];
+  // Aquí se define formContent a partir de form.content
+  const formContent = JSON.parse(form.content) as FormElementInstance[];
 
   const columns: {
     id: string;
@@ -133,7 +135,7 @@ async function SubmissionsTable({ id }: { id: number }) {
     type: ElementsType;
   }[] = [];
 
-  formElements.forEach((element) => {
+  formContent.forEach((element) => {
     switch (element.type) {
       case "TextField":
       case "DateFíeld":
@@ -156,21 +158,19 @@ async function SubmissionsTable({ id }: { id: number }) {
 
   const rows: Rows[] = [];
   form.FormSubmissions.forEach((submission) => {
-    const content = JSON.parse(submission.content);
+    const { formValues, submittedAt } = JSON.parse(submission.content);
     rows.push({
-      ...content,
+      ...formValues,
       submittedAt: submission.createdAt,
     });
   });
-  
-  
 
   return (
     <>
-    <div className="flex justify-between">
- <h1 className="text-2xl font-bold my-4"> Enviados</h1>
-    </div>
-     
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold my-4">Enviados</h1>
+      </div>
+
       <div className="rounded-md">
         <Table>
           <TableHeader>
@@ -199,14 +199,15 @@ async function SubmissionsTable({ id }: { id: number }) {
                 ))}
                 <TableCell className="text-muted-foreground text-right">
                   {formatDistance(row.submittedAt, new Date(), {
-                    addSuffix: true
+                    addSuffix: true,
                   })}
                 </TableCell>
                 <TableCell>
-                  <EditButton
-                   rowData={row} columns={columns} 
+                  <EditButtonWithModal
+                    rowData={row}
+                    columns={columns}
+                    formContent={formContent}  // Aquí se pasa formContent
                   />
-                
                 </TableCell>
               </TableRow>
             ))}
@@ -214,7 +215,7 @@ async function SubmissionsTable({ id }: { id: number }) {
         </Table>
       </div>
 
-      <Araña/>
+      <Araña />
     </>
   );
 }

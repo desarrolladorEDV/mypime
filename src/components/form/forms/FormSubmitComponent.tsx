@@ -44,7 +44,7 @@ function FormSubmitComponent({
     calculateTotal();
   }, [content, calculateTotal]);
 
-  const validateForm: () => boolean = useCallback(() => {
+  const validateForm = useCallback(() => {
     for (const field of content) {
       const actualValue = formValues.current[field.id] || "";
       const valid = FormElements[field.type].validate(field, actualValue);
@@ -63,7 +63,7 @@ function FormSubmitComponent({
 
   const submitValue = useCallback((key: string, value: string) => {
     formValues.current[key] = value;
-    calculateTotal();  // Update total when a value is submitted
+    calculateTotal();
   }, [calculateTotal]);
 
   const submitForm = async () => {
@@ -81,7 +81,8 @@ function FormSubmitComponent({
 
     try {
       const jsonContent = JSON.stringify({ ...formValues.current, total });
-      await SubmitForm(formUrl, jsonContent);
+      // Aquí guarda las opciones del select junto con los datos enviados
+      await SubmitForm(formUrl, JSON.stringify({ formValues: formValues.current, total, content }));
       setSubmitted(true);
       if (onClose) onClose();
     } catch (error) {
@@ -127,8 +128,7 @@ function FormSubmitComponent({
               elementInstance={element}
               submitValue={submitValue}
               isInvalid={formErrors.current[element.id]}
-              defaultValue={formValues.current[element.id]}
-              options={element.extraAttributes.options} 
+              defaultValue={formValues.current[element.id]}   
             />
           );
         })}
