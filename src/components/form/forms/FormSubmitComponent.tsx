@@ -20,29 +20,33 @@ function FormSubmitComponent({
   const formValues = useRef<{ [key: string]: string }>({});
   const formErrors = useRef<{ [key: string]: boolean }>({});
   const [renderKey, setRenderKey] = useState(new Date().getTime());
-  const [total, setTotal] = useState(0);
+  const [totals, setTotals] = useState<{ [key: string]: number }>({});
 
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     formValues.current = { ...initialValues };
-    calculateTotal();
+    calculateTotals();
   }, [initialValues]);
 
-  const calculateTotal = useCallback(() => {
-    const sum = content.reduce((acc, element) => {
-      if (element.type === "NumericSelectField" && formValues.current[element.id] !== undefined) {
-        return acc + parseFloat(formValues.current[element.id] || "0");
+  const calculateTotals = useCallback(() => {
+    const newTotals: { [key: string]: number } = {};
+    content.forEach((element) => {
+      if (element.type === "NumberField" && formValues.current[element.id]) {
+        const value = parseFloat(formValues.current[element.id]);
+        const identifier = (element as any).extraAttributes.identifier;
+        if (identifier) {
+          newTotals[identifier] = (newTotals[identifier] || 0) + value;
+        }
       }
-      return acc;
-    }, 0);
-    setTotal(sum);
+    });
+    setTotals(newTotals);
   }, [content]);
 
   useEffect(() => {
-    calculateTotal();
-  }, [content, calculateTotal]);
+    calculateTotals();
+  }, [content, calculateTotals]);
 
   const validateForm = useCallback(() => {
     for (const field of content) {
@@ -54,17 +58,13 @@ function FormSubmitComponent({
       }
     }
 
-    if (Object.keys(formErrors.current).length > 0) {
-      return false;
-    }
-
-    return true;
+    return Object.keys(formErrors.current).length === 0;
   }, [content]);
 
   const submitValue = useCallback((key: string, value: string) => {
     formValues.current[key] = value;
-    calculateTotal();
-  }, [calculateTotal]);
+    calculateTotals();
+  }, [calculateTotals]);
 
   const submitForm = async () => {
     formErrors.current = {};
@@ -80,9 +80,9 @@ function FormSubmitComponent({
     }
 
     try {
-      const jsonContent = JSON.stringify({ ...formValues.current, total });
-      // Aquí guarda las opciones del select junto con los datos enviados
-      await SubmitForm(formUrl, JSON.stringify({ formValues: formValues.current, total, content }));
+      const jsonContent = JSON.stringify({ ...formValues.current, totals });
+
+      await SubmitForm(formUrl, jsonContent);
       setSubmitted(true);
       if (onClose) onClose();
     } catch (error) {
@@ -92,21 +92,15 @@ function FormSubmitComponent({
         variant: "destructive",
       });
     }
-
-    console.log(formValues.current);
   };
 
   if (submitted) {
     return (
       <div className="flex justify-center w-full h-full items-center p-8">
-        <div
-          key={renderKey}
-          className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background
-           w-full p-8 overflow-y-auto border  rounded"
-        >
+        <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border rounded">
           <h1 className="text-2xl font-bold">Formulario enviado</h1>
           <p className="text-muted-foreground">
-            Gracias por tu tiempo, tú puedes cerrar esta ventana ahora.
+            Gracias por tu tiempo, puedes cerrar esta ventana ahora.
           </p>
         </div>
       </div>
@@ -115,11 +109,7 @@ function FormSubmitComponent({
 
   return (
     <div className="flex justify-center w-full h-full items-center p-8">
-      <div
-        key={renderKey}
-        className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background
-         w-full p-8 overflow-y-auto border  rounded"
-      >
+      <div key={renderKey} className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border rounded">
         {content.map((element) => {
           const FormElement = FormElements[element.type].formComponent;
           return (
@@ -133,7 +123,12 @@ function FormSubmitComponent({
           );
         })}
         <div className="mt-4 p-4 rounded-md">
-          <p className="text-lg font-bold">Total: {total}</p>
+          <h2 className="text-lg font-bold mb-2">Totales por identificador:</h2>
+          {Object.entries(totals).map(([identifier, total]) => (
+            <p key={identifier} className="text-md">
+              {identifier}: {total}
+            </p>
+          ))}
         </div>
         <Button
           className="mt-8"

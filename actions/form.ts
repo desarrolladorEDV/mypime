@@ -170,6 +170,12 @@ export async function SubmitForm(formUrl: string, content: string) {
     const parsedContent = JSON.parse(content);
     const { total, ...otherFields } = parsedContent;
 
+    // Validar que total es un número
+    const totalValue = parseFloat(total);
+    if (isNaN(totalValue)) {
+      console.warn("El campo 'total' no es un número válido, se guardará como 0.");
+    }
+
     // Guardar las opciones del SelectField y otros campos
     return await prisma.form.update({
       data: {
@@ -179,7 +185,7 @@ export async function SubmitForm(formUrl: string, content: string) {
         FormSubmissions: {
           create: {
             content: JSON.stringify(parsedContent), // Guardar todo el contenido
-            total: parseFloat(total), // Guardar el campo total
+            total: isNaN(totalValue) ? 0 : totalValue, // Guardar el campo total o 0 si no es un número válido
           },
         },
       },
@@ -193,6 +199,7 @@ export async function SubmitForm(formUrl: string, content: string) {
     throw new Error("Error al enviar el formulario");
   }
 }
+
 
 
 export async function GetFormWithSubmissions (id: number) {
@@ -224,4 +231,39 @@ export async function getSubmissionsData() {
 
 
 
+export async function DeleteSubmission(submissionId: number) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+
+  try {
+    // Primero, obtengamos la submission para verificar que existe
+    const submission = await prisma.formSubmission.findUnique({
+      where: { id: submissionId },
+    });
+
+    if (!submission) {
+      throw new Error("Submission no encontrada");
+    }
+
+    // Ahora procedemos con la eliminación
+    const deletedSubmission = await prisma.formSubmission.delete({
+      where: { id: submissionId },
+    });
+
+    if (deletedSubmission) {
+      // Actualizar el conteo de submissions en el formulario correspondiente
+      await prisma.form.update({
+        where: { id: deletedSubmission.formId },
+        data: { submissions: { decrement: 1 } },
+      });
+    }
+
+    return deletedSubmission;
+  } catch (error) {
+    console.error("Error detallado al eliminar la submission:", error);
+    throw new Error(`No se pudo eliminar la submission: ${error.message}`);
+  }
+}
 

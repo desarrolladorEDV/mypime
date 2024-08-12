@@ -1,11 +1,9 @@
 "use client"
-import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { FormElements, FormElementInstance } from "@/components/form/disingner/FormElemets";
-import { useRouter } from "next/navigation";
-
-import { toast } from "@/components/ui/use-toast";
+import { ClipboardPenLine } from "lucide-react";
 
 interface EditButtonWithModalProps {
   rowData: Record<string, any>;
@@ -23,17 +21,13 @@ export  function EditButtonWithModal({
   columns,
   formContent,  // Añadido: El contenido completo del formulario
 }: EditButtonWithModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleModal = () => {
-    setIsOpen(!isOpen);
-  };
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={toggleModal}>
+      <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">Editar</Button>
+          <Button variant="outline" size={"icon"}><ClipboardPenLine className="h-4 w-4" /></Button>
         </DialogTrigger>
         <DialogContent className="max-w-md">
           <div className="space-y-4">

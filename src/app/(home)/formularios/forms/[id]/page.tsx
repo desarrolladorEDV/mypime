@@ -6,7 +6,12 @@ import {
 import VisitBtn from "@/components/form/forms/VisitBtn";
 import FormLinkShare from "@/components/form/forms/FormLinkShare";
 import { StatsCard } from "../../page";
-import { BookText, CirclePlus, FilePenLine, MousePointerClick } from "lucide-react";
+import {
+  BookText,
+  CirclePlus,
+  FilePenLine,
+  MousePointerClick,
+} from "lucide-react";
 import {
   ElementsType,
   FormElementInstance,
@@ -26,7 +31,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 //import EditButton from "@/components/form/accionestable/EditButton";
 import { Araña } from "@/components/Araña";
 import { EditButtonWithModal } from "@/components/form/accionestable/EditButton";
-
+import { SubmissionRow } from "@/components/form/accionestable/SubmissionRow";
 
 async function FormDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -160,6 +165,7 @@ async function SubmissionsTable({ id }: { id: number }) {
   form.FormSubmissions.forEach((submission) => {
     const { formValues, submittedAt } = JSON.parse(submission.content);
     rows.push({
+      id: submission.id, // Asegúrate de que el id se está incluyendo aquí
       ...formValues,
       submittedAt: submission.createdAt,
     });
@@ -189,27 +195,13 @@ async function SubmissionsTable({ id }: { id: number }) {
           </TableHeader>
           <TableBody>
             {rows.map((row, index) => (
-              <TableRow key={index}>
-                {columns.map((column) => (
-                  <RowCell
-                    key={column.id}
-                    type={column.type}
-                    value={row[column.id]}
-                  />
-                ))}
-                <TableCell className="text-muted-foreground text-right">
-                  {formatDistance(row.submittedAt, new Date(), {
-                    addSuffix: true,
-                  })}
-                </TableCell>
-                <TableCell>
-                  <EditButtonWithModal
-                    rowData={row}
-                    columns={columns}
-                    formContent={formContent}  // Aquí se pasa formContent
-                  />
-                </TableCell>
-              </TableRow>
+              <SubmissionRow
+                key={row.id} // Usa row.id en lugar de index si está disponible
+                row={row}
+                columns={columns}
+                formContent={formContent}
+                formId={id}
+              />
             ))}
           </TableBody>
         </Table>
@@ -218,25 +210,4 @@ async function SubmissionsTable({ id }: { id: number }) {
       <Araña />
     </>
   );
-}
-
-
-function RowCell({ type, value }: { type: ElementsType, value: string }) {
-  let node: ReactNode = value;
-
-  switch (type) {
-    case "DateFíeld":
-      if (!value) break;
-      const date = new Date(value);
-      node = <Badge variant="outline">{format(date, "dd/MM/yyyy")}</Badge>;
-      break;
-    case "CheckboxField":
-      const cheked = value === "true" ? true : false;
-      node = <Checkbox checked={cheked} disabled />;
-      break;
-    default:
-      break;
-  }
-
-  return <TableCell>{node}</TableCell>;
 }

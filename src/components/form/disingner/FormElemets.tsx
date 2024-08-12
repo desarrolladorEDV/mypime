@@ -5,7 +5,7 @@
 import { CheckboxFieldFormElement } from "./fields/CheckboxField";
 import { DateFíeldFormElement } from "./fields/DateFíeld";
 import { NumberFieldFormElement } from "./fields/NumberField";
-import { NumericSelectFieldFormElement } from "./fields/NumericSelectField";
+
 import { ParagraphFieldFormElement } from "./fields/ParagraphField";
 import { SelectFieldFormElement } from "./fields/SelectField";
 import { SeparatorFieldFormElement } from "./fields/SeparatorField";
@@ -37,8 +37,12 @@ export type ElementsType =
  *
  * Un elemento de formulario es de tipo, un constructor para crear una instancia
  * del elemento, un elemento de botón para el diseñador UI, y tres componentes react
- * para el UI de diseñador, formulario y propiedades.
+ * para e
+ * 
+ * l UI de diseñador, formulario y propiedades.
  */
+
+
 export type FormElement = {
   //El tipo de elemento de formulario.
   type: ElementsType;
@@ -119,5 +123,5 @@ export const FormElements: FormElementsType = {
   DateFíeld: DateFíeldFormElement,
   SelectField: SelectFieldFormElement,
   CheckboxField: CheckboxFieldFormElement,
-  NumericSelectField: NumericSelectFieldFormElement,
+
 };

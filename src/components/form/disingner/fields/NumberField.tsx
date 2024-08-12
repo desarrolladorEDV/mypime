@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 
@@ -32,15 +33,25 @@ const extraAttributes = {
   helperText: "Helper text",
   required: false,
   placeHolder: "Escriba aqui...",
+  identifier: "administracion", // Valor por defecto
 };
+
+const identifierOptions = [
+  "administracion",
+  "talento humano",
+  "contabilidad y finanzas",
+  "marketing",
+  "operacion y produccion",
+  "innovacion"
+];
 
 const propiertiesSchema = z.object({
   label: z.string().min(2).max(100),
   helperText: z.string().max(200),
   required: z.boolean().default(false),
   placeHolder: z.string().max(50),
+  identifier: z.enum(identifierOptions),
 });
-
 export const NumberFieldFormElement: FormElement = {
   type,
   construct: (id: string) => ({
@@ -90,6 +101,7 @@ function PropertiesComponent({
       helperText: element.extraAttributes.helperText,
       required: element.extraAttributes.required,
       placeHolder: element.extraAttributes.placeHolder,
+      identifier: element.extraAttributes.identifier,
     },
   });
 
@@ -98,7 +110,7 @@ function PropertiesComponent({
   }, [element, form]);
 
   function applyChanges(values: PropertiesFormSchemaType) {
-    const { label, helperText, required, placeHolder } = values;
+    const { label, helperText, required, placeHolder,  identifier, } = values;
 
     updateElemet(element.id, {
       ...element,
@@ -107,6 +119,7 @@ function PropertiesComponent({
         helperText,
         required,
         placeHolder,
+        identifier,
       },
     });
   }
@@ -208,6 +221,34 @@ function PropertiesComponent({
             </FormItem>
           )}
         />
+
+<FormField
+          control={form.control}
+          name="identifier"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Identificador</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccione un identificador" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {identifierOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Seleccione el identificador para este campo numérico.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );
@@ -219,72 +260,80 @@ function DesignerComponent({
   elementInstance: FormElementInstance;
 }) {
   const element = elementInstance as CustomInstance;
-  const { label, helperText, required, placeHolder } = element.extraAttributes;
+  const { label, helperText, required, placeHolder, identifier } = element.extraAttributes;
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label className="font-medium text-sm">
-        {element.extraAttributes.label}
-        {element.extraAttributes.required && "*"}
+        {label}
+        {required && "*"}
       </Label>
       <Input
         readOnly
         disabled
         type="number"
-        placeholder={element.extraAttributes.placeHolder}
+        placeholder={placeHolder}
       />
       {helperText && (
         <p className="text-xs text-muted-foreground">{helperText}</p>
       )}
+      <p className="text-xs text-muted-foreground">Identificador: {identifier}</p>
     </div>
   );
 }
 
 function FormComponent({
-    elementInstance,
-    submitValue,
-    isInvalid,
-    defaultValue
-  }: {
-    elementInstance: FormElementInstance;
-    submitValue?:SubmitFunction;
-    isInvalid?:boolean;
-    defaultValue?:string;
-  }) {
-    const element = elementInstance as CustomInstance;
+  elementInstance,
+  submitValue,
+  isInvalid,
+  defaultValue
+}: {
+  elementInstance: FormElementInstance;
+  submitValue?: SubmitFunction;
+  isInvalid?: boolean;
+  defaultValue?: string;
+}) {
+  const element = elementInstance as CustomInstance;
+  const [value, setValue] = useState(defaultValue || "");
+  const [error, setError] = useState(false);
 
-    const [value, setValue] = useState(defaultValue || "");
-    const [error, setError] = useState(false);
+  useEffect(() => {
+    setError(isInvalid === true);
+  }, [isInvalid]);
 
-    useEffect(() => {
-      setError(isInvalid===true);
-    }, [isInvalid]);
-
-    const { label, helperText, required, placeHolder } = element.extraAttributes;
-    return (
-      <div className="flex flex-col gap-2 w-full">
-        <Label className={cn(error && "text-red-500")}>
-          {element.extraAttributes.label}
-          {element.extraAttributes.required && "*"}
-        </Label>
-        <Input
+  const { label, helperText, required, placeHolder, identifier } = element.extraAttributes;
+  
+  return (
+    <div className="flex flex-col gap-2 w-full">
+      <Label className={cn(error && "text-red-500")}>
+        {label}
+        {required && "*"}
+      </Label>
+      <Input
         type="number"
         className={cn(error && "border-red-500")}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={(e) => {
-            if(!submitValue) return;
-            const valid = NumberFieldFormElement.validate(element, e.target.value);
-            setError(!valid);
-            if(!valid) return;
-            submitValue(element.id, e.target.value)
-          }}
-          value={value}
-          placeholder={element.extraAttributes.placeHolder}
-        />
-        {helperText && (
-          <p className={cn("text-xs text-muted-foreground",
-            error && "text-red-500"
-           )}>{helperText}</p>
-        )}
-      </div>
-    );
-  }
+        onChange={(e) => {
+          setValue(e.target.value);
+          if (submitValue) {
+            submitValue(element.id, e.target.value);
+          }
+        }}
+        onBlur={(e) => {
+          if (!submitValue) return;
+          const valid = NumberFieldFormElement.validate(element, e.target.value);
+          setError(!valid);
+          if (!valid) return;
+          submitValue(element.id, e.target.value);
+        }}
+        value={value}
+        placeholder={placeHolder}
+      />
+      {helperText && (
+        <p className={cn("text-xs text-muted-foreground", error && "text-red-500")}>
+          {helperText}
+        </p>
+      )}
+      <p className="text-xs text-muted-foreground">Identificador: {identifier}</p>
+    </div>
+  );
+}
+
