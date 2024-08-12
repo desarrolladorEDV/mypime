@@ -27,7 +27,6 @@ export type ElementsType =
   | "DateFíeld"
   | "SelectField"
   | "CheckboxField"
-  | "NumericSelectField";
   
   export type SubmitFunction = (key: string, value: string) => void;
 

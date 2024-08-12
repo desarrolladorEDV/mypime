@@ -7,17 +7,8 @@ import { FormElements } from "./FormElemets";
 
 function PreviewDialogBtn() {
   const { elements } = useDesigner();
-  const [total, setTotal] = useState<number>(0);
+  //const [total, setTotal] = useState<number>(0);
 
-  useEffect(() => {
-    const sum = elements.reduce((acc, element) => {
-      if (element.type === "NumericSelectField" && element.value !== undefined) {
-        return acc + element.value;
-      }
-      return acc;
-    }, 0);
-    setTotal(sum);
-  }, [elements]);
 
   return (
     <Dialog>
@@ -43,7 +34,7 @@ function PreviewDialogBtn() {
               return <FormComponent key={element.id} elementInstance={element} />;
             })}
             <div className="mt-4 p-4 rounded-md">
-              <p className="text-lg font-bold">Total: {total}</p>
+              <p className="text-lg font-bold">Total:</p>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import React, { useCallback, useEffect, useState, useTransition } from "react";
 import { FormElementInstance, FormElements } from "../disingner/FormElemets";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
@@ -17,60 +17,81 @@ function FormSubmitComponent({
   initialValues?: { [key: string]: string };
   onClose?: () => void;
 }) {
-  const formValues = useRef<{ [key: string]: string }>({});
-  const formErrors = useRef<{ [key: string]: boolean }>({});
-  const [renderKey, setRenderKey] = useState(new Date().getTime());
+  const [formValues, setFormValues] = useState<{ [key: string]: string }>(initialValues);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: boolean }>({});
   const [totals, setTotals] = useState<{ [key: string]: number }>({});
-
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
-    formValues.current = { ...initialValues };
-    calculateTotals();
+    console.log("Initial values:", initialValues);
+    calculateTotals(initialValues); // Calcula los totales iniciales solo una vez al montar
   }, [initialValues]);
 
-  const calculateTotals = useCallback(() => {
-    const newTotals: { [key: string]: number } = {};
-    content.forEach((element) => {
-      if (element.type === "NumberField" && formValues.current[element.id]) {
-        const value = parseFloat(formValues.current[element.id]);
-        const identifier = (element as any).extraAttributes.identifier;
-        if (identifier) {
-          newTotals[identifier] = (newTotals[identifier] || 0) + value;
-        }
-      }
-    });
-    setTotals(newTotals);
-  }, [content]);
+  const calculateTotals = useCallback(
+    (values: { [key: string]: string }) => {
+      const newTotals: { [key: string]: number } = {};
+      console.log("Calculating totals with formValues:", values);
 
-  useEffect(() => {
-    calculateTotals();
-  }, [content, calculateTotals]);
+      content.forEach((element) => {
+        if (element.type === "NumberField") {
+          const identifier = (element.extraAttributes as any).identifier;
+          const value = parseFloat(values[element.id] || "0");
+
+          console.log(`Processing element ID: ${element.id}, value: ${value}, identifier: ${identifier}`);
+
+          if (value !== 0) {
+            if (!newTotals[identifier]) {
+              newTotals[identifier] = 0;
+            }
+            newTotals[identifier] += value;
+          }
+        }
+      });
+
+      console.log("New totals calculated:", newTotals);
+      setTotals((prevTotals) => {
+        const totalsChanged = Object.keys(newTotals).some((key) => newTotals[key] !== prevTotals[key]);
+        if (totalsChanged) {
+          console.log("Updating totals state.");
+          return newTotals;
+        }
+        return prevTotals;
+      });
+    },
+    [content]
+  );
 
   const validateForm = useCallback(() => {
-    for (const field of content) {
-      const actualValue = formValues.current[field.id] || "";
+    const errors: { [key: string]: boolean } = {};
+    let isValid = true;
+
+    content.forEach((field) => {
+      const actualValue = formValues[field.id] || "";
       const valid = FormElements[field.type].validate(field, actualValue);
 
       if (!valid) {
-        formErrors.current[field.id] = true;
+        errors[field.id] = true;
+        isValid = false;
       }
-    }
+    });
 
-    return Object.keys(formErrors.current).length === 0;
-  }, [content]);
+    setFormErrors(errors);
+    return isValid;
+  }, [content, formValues]);
 
-  const submitValue = useCallback((key: string, value: string) => {
-    formValues.current[key] = value;
-    calculateTotals();
-  }, [calculateTotals]);
+  const submitValue = useCallback(
+    (key: string, value: string) => {
+      console.log(`Submitting value: ${value} for key: ${key}`);
+      const updatedValues = { ...formValues, [key]: value };
+      setFormValues(updatedValues);
+      calculateTotals(updatedValues);
+    },
+    [formValues, calculateTotals]
+  );
 
   const submitForm = async () => {
-    formErrors.current = {};
-    const validForm = validateForm();
-    if (!validForm) {
-      setRenderKey(new Date().getTime());
+    if (!validateForm()) {
       toast({
         title: "Error",
         description: "Por favor revisa los campos",
@@ -80,12 +101,17 @@ function FormSubmitComponent({
     }
 
     try {
-      const jsonContent = JSON.stringify({ ...formValues.current, totals });
-
-      await SubmitForm(formUrl, jsonContent);
+      const formData = {
+        formValues,
+        totals,
+        content,
+      };
+      console.log("Form data to be submitted:", formData);
+      await SubmitForm(formUrl, JSON.stringify(formData));
       setSubmitted(true);
       if (onClose) onClose();
     } catch (error) {
+      console.error("Error submitting form:", error);
       toast({
         title: "Error",
         description: "Algo salió mal",
@@ -109,7 +135,7 @@ function FormSubmitComponent({
 
   return (
     <div className="flex justify-center w-full h-full items-center p-8">
-      <div key={renderKey} className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border rounded">
+      <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border rounded">
         {content.map((element) => {
           const FormElement = FormElements[element.type].formComponent;
           return (
@@ -117,26 +143,25 @@ function FormSubmitComponent({
               key={element.id}
               elementInstance={element}
               submitValue={submitValue}
-              isInvalid={formErrors.current[element.id]}
-              defaultValue={formValues.current[element.id]}   
+              isInvalid={formErrors[element.id]}
+              defaultValue={formValues[element.id]}
             />
           );
         })}
-        <div className="mt-4 p-4 rounded-md">
-          <h2 className="text-lg font-bold mb-2">Totales por identificador:</h2>
-          {Object.entries(totals).map(([identifier, total]) => (
-            <p key={identifier} className="text-md">
-              {identifier}: {total}
-            </p>
-          ))}
+
+        <div className="mt-4 p-4 border-t">
+          <h2 className="text-lg font-bold">Totales por Identificador</h2>
+          <ul>
+            {Object.entries(totals).map(([identifier, total]) => (
+              <li key={identifier}>
+                <span className="font-semibold">{identifier}: </span>
+                <span>{total}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <Button
-          className="mt-8"
-          onClick={() => {
-            startTransition(submitForm);
-          }}
-          disabled={pending}
-        >
+
+        <Button className="mt-8" onClick={() => startTransition(submitForm)} disabled={pending}>
           {!pending && <>Enviar</>}
           {pending && <Loader className="w-4 h-4 animate-spin" />}
         </Button>
