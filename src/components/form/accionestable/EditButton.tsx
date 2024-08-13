@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { FormElements, FormElementInstance } from "@/components/form/disingner/FormElemets";
+import { FormElements, FormElementInstance, ElementsType } from "@/components/form/disingner/FormElemets";
 import { ClipboardPenLine } from "lucide-react";
 
 interface EditButtonWithModalProps {
@@ -29,8 +29,16 @@ export  function EditButtonWithModal({
         <DialogTrigger asChild>
           <Button variant="outline" size={"icon"}><ClipboardPenLine className="h-4 w-4" /></Button>
         </DialogTrigger>
-        <DialogContent className="max-w-md">
-          <div className="space-y-4">
+        <DialogContent className="w-screen h-screen max-h-screen max-w-full flex flex-col flex-grow p-0 gap-0">
+        <div className="px-4 py-2 border-b">
+          <p className="text-lg font-bold text-muted-foreground">
+            Editar respuesta
+          </p>
+         
+        </div>
+          
+          <div className="bg-accent flex flex-col flex-grow items-center justify-center p-4 bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)] overflow-y-auto">
+          <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background h-full w-full rounded-2xl p-8 overflow-y-auto">
             {columns.map((column) => {
               const FormComponent =
                 FormElements[column.type as keyof typeof FormElements]
@@ -50,7 +58,7 @@ export  function EditButtonWithModal({
                   key={column.id}
                   elementInstance={{
                     id: column.id,
-                    type: column.type,
+                    type: column.type as ElementsType,
                     value: rowData[column.id],
                     extraAttributes: {
                       ...originalElement?.extraAttributes,
@@ -61,6 +69,7 @@ export  function EditButtonWithModal({
                 />
               );
             })}
+          </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -1,19 +1,32 @@
-"use client"
-
-import { useState } from "react";
-import { TableCell, TableRow } from "@/components/ui/table";
+"use client";
 import { useRouter } from "next/navigation";
-//import { RowCell } from "./RowCell"; // Asumiendo que has movido RowCell a un archivo separado
-import { format, formatDistance } from "date-fns";
-import EliminarButton from "./EiminarButton";
-import { EditButtonWithModal } from "./EditButton";
-import { DeleteSubmission } from "../../../../actions/form";
-import { toast } from "@/components/ui/use-toast";
-import Error from "next/error";
+import { ReactNode, useState } from "react";
+import { ElementsType, FormElementInstance } from "@/components/form/disingner/FormElemets"; // Importa el tipo correcto
+import { TableRow, TableCell } from "@/components/ui/table"; // Asegúrate de tener estos componentes
+import { format, formatDistance } from "date-fns"; // Asegúrate de importar esto si estás usando la función
+import { toast } from "@/components/ui/use-toast"; // Asegúrate de importar el sistema de notificaciones que estés usando
+import { EditButtonWithModal } from "./EditButton"; // Importa tu componente
+ // Importa tu botón de eliminar
+import { DeleteSubmission } from "../../../../actions/form"; // Asegúrate de importar correctamente
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import EliminarButton from "./EiminarButton";
 
-export function SubmissionRow({ row, columns, formContent, formId }) {
+interface Column {
+  id: string;
+  label: string;
+  required: boolean;
+  type: ElementsType; // Asegúrate de que ElementsType esté importado correctamente
+}
+
+interface SubmissionRowProps {
+  row: Record<string, any> & { id: number; submittedAt: Date }; // Define que `row` tiene un `id` y `submittedAt`, además de otras posibles propiedades
+  columns: Column[];
+  formContent: FormElementInstance[];
+  formId: number;
+}
+
+export function SubmissionRow({ row, columns, formContent, formId }: SubmissionRowProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -30,7 +43,7 @@ export function SubmissionRow({ row, columns, formContent, formId }) {
       console.error("Error al eliminar la submission:", error);
       toast({
         title: "Error",
-        description: Error|| "No se pudo eliminar la submission",
+        description: (error as Error).message || "No se pudo eliminar la submission",
         variant: "destructive",
       });
     } finally {
@@ -41,11 +54,12 @@ export function SubmissionRow({ row, columns, formContent, formId }) {
   return (
     <TableRow>
       {columns.map((column) => (
-        <RowCell
-          key={column.id}
-          type={column.type}
-          value={row[column.id]}
-        />
+        <TableCell key={column.id}>
+          <RowCell
+            type={column.type}
+            value={row[column.id]}
+          />
+        </TableCell>
       ))}
       <TableCell className="text-muted-foreground text-right">
         {formatDistance(row.submittedAt, new Date(), {
@@ -67,6 +81,7 @@ export function SubmissionRow({ row, columns, formContent, formId }) {
     </TableRow>
   );
 }
+
 
 
 

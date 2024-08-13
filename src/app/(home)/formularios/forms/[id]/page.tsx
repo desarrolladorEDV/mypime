@@ -5,7 +5,7 @@ import {
 } from "../../../../../../actions/form";
 import VisitBtn from "@/components/form/forms/VisitBtn";
 import FormLinkShare from "@/components/form/forms/FormLinkShare";
-import { StatsCard } from "../../page";
+
 import {
   BookText,
   CirclePlus,
@@ -24,14 +24,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDistance } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { Checkbox } from "@/components/ui/checkbox";
-//import EditButton from "@/components/form/accionestable/EditButton";
+
 import { Araña } from "@/components/Araña";
-import { EditButtonWithModal } from "@/components/form/accionestable/EditButton";
+
 import { SubmissionRow } from "@/components/form/accionestable/SubmissionRow";
+import { Separator } from "@/components/ui/separator";
+import { StatsCard } from "@/app/(home)/page";
 
 async function FormDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -56,61 +54,60 @@ async function FormDetailPage({ params }: { params: { id: string } }) {
 
   return (
     <>
-      <div className="py-10  border-b border-muted">
+      <div className="flex-1 space-y-4 p-2 border rounded ">
+        <div className="mt-2 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatsCard
+            title="Total visitas"
+            icon={<BookText className="h-4 w-4" />}
+            helperText="Todas las visitas"
+            value={visits?.toLocaleString() || ""}
+            loading={false}
+            className=""
+          />
+
+          <StatsCard
+            title="Total envíos"
+            icon={<CirclePlus className="h-4 w-4" />}
+            helperText="Todos los envíos"
+            value={submissions?.toLocaleString() || ""}
+            loading={false}
+            className=""
+          />
+
+          <StatsCard
+            title="Tasa de envíos"
+            icon={<MousePointerClick className="h-4 w-4" />}
+            helperText="Vistas en envíos de formularios"
+            value={submissionRate?.toLocaleString() + "%" || ""}
+            loading={false}
+            className=""
+          />
+
+          <StatsCard
+            title="Porcentaje de rebotes"
+            icon={<CirclePlus className="h-4 w-4" />}
+            helperText="Visitas que te dejan sin interactuar"
+            value={bounceRate?.toLocaleString() + "%" || ""}
+            loading={false}
+            className=""
+          />
+        </div>
         <div className="flex justify-between container">
           <h1 className="text-4xl font-bold truncate">{form.name}</h1>
           <VisitBtn shareURL={form.shareURL} />
         </div>
-      </div>
-      <div className="py-4 border-b flex gap-2 items-center justify-between container">
-        <div className=" w-full p-2 flex gap-2 items-center justify-between">
-          <FormLinkShare shareURL={form.shareURL} />
+        <div className="py-4 border-b flex gap-2 items-center justify-between container">
+          <div className=" w-full p-2 flex gap-2 items-center justify-between">
+            <FormLinkShare shareURL={form.shareURL} />
+          </div>
+        </div>
+
+
+        <div className="container p-10">
+          <SubmissionsTable id={form.id} />
         </div>
       </div>
-      <div
-        className="w-full pt-8 gap-4 grid grid-cols-1 md:grid-cols-2 
-        lg:grid-cols-4 p-2"
-      >
-        <StatsCard
-          title="Total visitas"
-          icon={<BookText className="text-blue-600" />}
-          helperText="Todas las visitas"
-          value={visits.toLocaleString() || ""}
-          loading={false}
-          className="shadow-md shadow-blue-600"
-        />
 
-        <StatsCard
-          title="Total envíos"
-          icon={<CirclePlus className="text-yellow-600" />}
-          helperText="Todos los envíos"
-          value={submissions.toLocaleString() || ""}
-          loading={false}
-          className="shadow-md shadow-yellow-600"
-        />
-
-        <StatsCard
-          title="Tasa de envíos"
-          icon={<MousePointerClick className="text-green-600" />}
-          helperText="Vistas en envíos de formularios"
-          value={submissionRate.toLocaleString() + "%" || ""}
-          loading={false}
-          className="shadow-md shadow-green-600"
-        />
-
-        <StatsCard
-          title="Porcentaje de rebotes"
-          icon={<CirclePlus className="text-red-600" />}
-          helperText="Visitas que te dejan sin interactuar"
-          value={submissionRate.toLocaleString() + "%" || ""}
-          loading={false}
-          className="shadow-md shadow-red-600"
-        />
-      </div>
-
-      <div className="container p-10">
-        <SubmissionsTable id={form.id} />
-      </div>
     </>
   );
 }
@@ -118,10 +115,11 @@ async function FormDetailPage({ params }: { params: { id: string } }) {
 export default FormDetailPage;
 
 type Rows = {
-  [key: string]: string;
-} & {
-  submittedAt: Date;
+  id: number;  // Asegúrate de incluir id
+  submittedAt: Date;  // Asegúrate de incluir submittedAt
+  [key: string]: string | number | Date;  // Otras propiedades pueden ser string, number o Date
 };
+
 
 async function SubmissionsTable({ id }: { id: number }) {
   const form = await GetFormWithSubmissions(id);
@@ -161,14 +159,36 @@ async function SubmissionsTable({ id }: { id: number }) {
   });
 
   const rows: Rows[] = [];
+  const radarData: { [key: string]: number } = {};
+
   form.FormSubmissions.forEach((submission) => {
-    const { formValues, submittedAt } = JSON.parse(submission.content);
+    const { formValues, submittedAt, totals } = JSON.parse(submission.content);
+
+
+    // Agrega los datos de totals al radarData
+    for (const [key, value] of Object.entries(totals)) {
+      if (typeof value === "number") {
+        radarData[key] = (radarData[key] || 0) + value;
+      } else {
+        console.warn(`Expected number but received ${typeof value} for key ${key}`);
+      }
+    }
+    
+    
+
     rows.push({
       id: submission.id, // Asegúrate de que el id se está incluyendo aquí
       ...formValues,
       submittedAt: submission.createdAt,
     });
   });
+
+  // Convertir radarData en un array de objetos adecuado para el RadarChart
+  const chartData = Object.entries(radarData).map(([key, value]) => ({
+    identifier: key,
+    total: value,
+  }));
+
 
   return (
     <>
@@ -205,8 +225,8 @@ async function SubmissionsTable({ id }: { id: number }) {
           </TableBody>
         </Table>
       </div>
-
-      <Araña />
+      <Separator className="my-4" />
+      <Araña chartData={chartData} />
     </>
   );
 }

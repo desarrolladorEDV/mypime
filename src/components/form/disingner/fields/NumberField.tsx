@@ -28,25 +28,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const type: ElementsType = "NumberField";
 
-const extraAttributes = {
-  label: "Campo de numero",
-  helperText: "Helper text",
-  required: false,
-  placeHolder: "Escriba aqui...",
-  identifier: "administracion", // Valor por defecto
-};
-
 const identifierOptions = [
   "administracion",
   "talento humano",
   "contabilidad y finanzas",
   "marketing",
   "operacion y produccion",
-  "innovacion"
-];
+  "innovacion",
+] as const;
+
+// Paso 2: Define el tipo basado en los valores de identifierOptions
+type IdentifierOptionsType = typeof identifierOptions[number];
+
+const extraAttributes = {
+  label: "Campo de numero",
+  helperText: "Helper text",
+  required: false,
+  placeHolder: "Escriba aqui...",
+  identifier: "administracion" as IdentifierOptionsType, // Valor por defecto
+};
+
 
 const propiertiesSchema = z.object({
-  label: z.string().min(2).max(100),
+  label: z.string().min(2).max(300),
   helperText: z.string().max(200),
   required: z.boolean().default(false),
   placeHolder: z.string().max(50),

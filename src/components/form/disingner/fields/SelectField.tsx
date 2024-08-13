@@ -34,7 +34,7 @@ const extraAttributes = {
   helperText: "Helper text",
   required: false,
   placeHolder: "Escriba aqui...",
-  options: [] as string[],
+  options: ["Cumple", "No cumple"],  // Opciones predeterminadas
 
 };
 
@@ -80,6 +80,7 @@ type CustomInstance = FormElementInstance & {
 };
 
 type PropertiesFormSchemaType = z.infer<typeof propiertiesSchema>;
+
 function PropertiesComponent({
   elementInstance,
 }: {
@@ -95,7 +96,9 @@ function PropertiesComponent({
       helperText: element.extraAttributes.helperText,
       required: element.extraAttributes.required,
       placeHolder: element.extraAttributes.placeHolder,
-      options: element.extraAttributes.options,
+      options: element.extraAttributes.options.length > 0 
+      ? element.extraAttributes.options 
+      : ["Cumple", "No cumple"],
     },
   });
 
@@ -194,28 +197,29 @@ function PropertiesComponent({
           )}
         />
         <Separator/>
+       
         <FormField
           control={form.control}
           name="options"
           render={({ field }) => (
             <FormItem>
               <div className="flex justify-between items-center">
-              <FormLabel>Opciones</FormLabel>
-              <Button variant={"outline"} className="gap-2" onClick={e=>{
-                e.preventDefault();
-                form.setValue("options",field.value.concat(["Nueva Opción"]));
-              }}>
-                <Plus />
-                Agregar
-              </Button>
+                <FormLabel>Opciones</FormLabel>
+                <Button variant={"outline"} className="gap-2" onClick={e=>{
+                  e.preventDefault();
+                  form.setValue("options", field.value.concat(["Nueva Opción"]));
+                }}>
+                  <Plus />
+                  Agregar
+                </Button>
               </div>
               <div className="flex flex-col gap-2">
                 {form.watch("options").map((option, index) => (
                   <div
                     key={index} 
-                  className="flex items-center justify-between gap-1">
+                    className="flex items-center justify-between gap-1">
                     <Input
-                      placeholder="Opción"
+                      placeholder="Opción"
                       value={option}
                       onChange={(e) => {
                         field.value[index] = e.target.value;
@@ -237,9 +241,8 @@ function PropertiesComponent({
                   </div>
                 ))}
               </div>
-              
               <FormDescription>
-                El texto de ayuda para este campo.
+                Agrega, edita o elimina las opciones disponibles.
               </FormDescription>
               <FormMessage />
             </FormItem>

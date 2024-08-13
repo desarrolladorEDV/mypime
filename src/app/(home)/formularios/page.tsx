@@ -26,6 +26,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatDistance } from "date-fns";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Mas } from "@/components/form/Mas";
+import { StatsCard } from "../page";
 
 // Componente principal Home
 export default function Home() {
@@ -102,7 +104,7 @@ function StatsCards(props: StatsCardProps) {
         title="Porcentaje de rebotes"
         icon={<CirclePlus className="h-4 w-4" />}
         helperText="Visitas que te dejan sin interactuar"
-        value={data?.submissionRate?.toLocaleString() + "%" || ""}
+        value={data?.bounceRate?.toLocaleString() + "%" || ""}
         loading={loading}
         className=""
       />
@@ -111,43 +113,7 @@ function StatsCards(props: StatsCardProps) {
 }
 
 // Componente individual para cada tarjeta de estadísticas
-export function StatsCard({
-  title,
-  value,
-  icon,
-  helperText,
-  loading,
-  className,
-}: {
-  title: string;
-  value: string;
-  helperText: string;
-  className: string;
-  loading: boolean;
-  icon: ReactNode;
-}) {
-  return (
-    <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
-          {title}
-        </CardTitle>
-        {icon}
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">
-          {loading && (
-            <Skeleton>
-              <span className="opacity-0">0</span>
-            </Skeleton>
-          )}
-          {!loading && value}
-        </div>
-        <p className="text-xs text-muted-foreground">{helperText}</p>
-      </CardContent>
-    </Card>
-  );
-}
+
 
 // Componente Skeleton para la carga de los formularios
 function FormCardSkeleton() {
@@ -195,20 +161,32 @@ function FormCard({ form }: { form: Form }) {
         {form.description || "No hay descripción"}
       </CardContent>
       <CardFooter>
-        {form.published && (
-          <Button asChild className="w-full mt-2 text-md gap-4">
-            <Link href={`/formularios/forms/${form.id}`}>
-              Ver envíos <ArrowRight />
-            </Link>
-          </Button>
-        )}
-
-        {!form.published && (
-          <Button asChild className="w-full mt-2 text-md gap-4">
-            <Link href={`/formularios/builder/${form.id}`}>
-              Editar formulario  <ClipboardPen />
-            </Link>
-          </Button>
+      {form.published ? (
+          <div className="flex items-center justify-items-center w-full gap-2">
+            <div className="w-full">
+              <Button asChild className="w-full mt-2 text-md gap-4">
+                <Link href={`/formularios/forms/${form.id}`}>
+                  Ver envíos <ArrowRight />
+                </Link>
+              </Button>
+            </div>
+            <div className="w-auto">
+              <Mas formId={form.id} showOnlyDelete />
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-items-center w-full gap-2">
+            <div className="w-full">
+              <Button asChild className="w-full mt-2 text-md gap-4">
+                <Link href={`/formularios/builder/${form.id}`}>
+                  Editar formulario <ClipboardPen />
+                </Link>
+              </Button>
+            </div>
+            <div className="w-auto">
+              <Mas formId={form.id} initialName={form.name} initialDescription={form.description || ""} />
+            </div>
+          </div>
         )}
       </CardFooter>
     </Card>

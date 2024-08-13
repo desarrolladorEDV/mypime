@@ -20,10 +20,11 @@ import TableMarketing from "../(home)/components/instrumentos/TableMarketing";
 import { Overview } from "./components/overview";
 import { RecentSales } from "./components/recent-sales";
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/nextjs";
-import { Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 import { GetFormStats } from "../../../actions/form";
-import { StatsCard } from "./formularios/page";
+
 import { BookText, CirclePlus, MousePointerClick } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -88,9 +89,9 @@ export default function Home() {
                 {/* RECIENT SALES */}
                 <Card className="col-span-3">
                   <CardHeader>
-                    <CardTitle>Recent Sales</CardTitle>
+                    <CardTitle>Envíos recientes</CardTitle>
                     <CardDescription>
-                      You made 265 sales this month.
+                      
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -198,3 +199,42 @@ function StatsCards(props: StatsCardProps) {
     </div>
   );
 }
+
+ export function StatsCard({
+  title,
+  value,
+  icon,
+  helperText,
+  loading,
+  className,
+}: {
+  title: string;
+  value: string;
+  helperText: string;
+  className: string;
+  loading: boolean;
+  icon: ReactNode;
+}) {
+  return (
+    <Card className={className}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">
+          {title}
+        </CardTitle>
+        {icon}
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">
+          {loading && (
+            <Skeleton>
+              <span className="opacity-0">0</span>
+            </Skeleton>
+          )}
+          {!loading && value}
+        </div>
+        <p className="text-xs text-muted-foreground">{helperText}</p>
+      </CardContent>
+    </Card>
+  );
+}
+

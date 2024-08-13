@@ -7,11 +7,13 @@ import { Loader } from "lucide-react";
 import { SubmitForm } from "../../../../actions/form";
 
 function FormSubmitComponent({
+  formName, // Añadir aquí la prop formName
   formUrl,
   content,
   initialValues = {},
   onClose,
 }: {
+  formName: string;  // Declarar la prop formName aquí
   content: FormElementInstance[];
   formUrl: string;
   initialValues?: { [key: string]: string };
@@ -30,7 +32,9 @@ function FormSubmitComponent({
 
   const calculateTotals = useCallback(
     (values: { [key: string]: string }) => {
-      const newTotals: { [key: string]: number } = {};
+      const totalsSum: { [key: string]: number } = {};
+      const counts: { [key: string]: number } = {};
+
       console.log("Calculating totals with formValues:", values);
 
       content.forEach((element) => {
@@ -41,15 +45,24 @@ function FormSubmitComponent({
           console.log(`Processing element ID: ${element.id}, value: ${value}, identifier: ${identifier}`);
 
           if (value !== 0) {
-            if (!newTotals[identifier]) {
-              newTotals[identifier] = 0;
+            // Sumar los valores y contar las entradas para cada identificador
+            if (!totalsSum[identifier]) {
+              totalsSum[identifier] = 0;
+              counts[identifier] = 0;
             }
-            newTotals[identifier] += value;
+            totalsSum[identifier] += value;
+            counts[identifier] += 1;
           }
         }
       });
 
-      console.log("New totals calculated:", newTotals);
+      // Calcular el promedio para cada identificador
+      const newTotals: { [key: string]: number } = {};
+      Object.keys(totalsSum).forEach((identifier) => {
+        newTotals[identifier] = totalsSum[identifier] / counts[identifier];
+      });
+
+      console.log("New averages calculated:", newTotals);
       setTotals((prevTotals) => {
         const totalsChanged = Object.keys(newTotals).some((key) => newTotals[key] !== prevTotals[key]);
         if (totalsChanged) {
@@ -136,6 +149,11 @@ function FormSubmitComponent({
   return (
     <div className="flex justify-center w-full h-full items-center p-8">
       <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border rounded">
+     <div className="mb-3 border-b p-2">
+     <h1 className="text-2xl font-bold  truncate">{formName}</h1>
+  
+     </div>
+    
         {content.map((element) => {
           const FormElement = FormElements[element.type].formComponent;
           return (
@@ -150,12 +168,12 @@ function FormSubmitComponent({
         })}
 
         <div className="mt-4 p-4 border-t">
-          <h2 className="text-lg font-bold">Totales por Identificador</h2>
+          <h2 className="text-lg font-bold">Promedios por Identificador</h2>
           <ul>
             {Object.entries(totals).map(([identifier, total]) => (
               <li key={identifier}>
                 <span className="font-semibold">{identifier}: </span>
-                <span>{total}</span>
+                <span>{total.toFixed(2)}</span> {/* Muestra el promedio con 2 decimales */}
               </li>
             ))}
           </ul>

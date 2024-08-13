@@ -151,7 +151,8 @@ export async function PublishForm(id: number) {
 export async function GetFormContentByUrl(formUrl: string) {
   return prisma.form.update({
     select: {
-      content: true
+      content: true,
+      name: true
     },
     data: {
       visits: {
@@ -260,3 +261,75 @@ export async function DeleteSubmission(submissionId: number) {
   }
 }
 
+
+// Función para duplicar un formulario existente
+export async function DuplicateForm(formId: number) {
+  // Obtener el usuario actual desde Clerk
+  const user = await currentUser();
+  if (!user) {
+    throw new UserNotFoundErr();
+  }
+
+  // Buscar el formulario que se va a duplicar
+  const form = await prisma.form.findUnique({
+    where: { id: formId, userId: user.id },
+  });
+
+  if (!form) {
+    throw new Error("Formulario no encontrado");
+  }
+
+  // Crear un nuevo formulario duplicado
+  const duplicatedForm = await prisma.form.create({
+    data: {
+      userId: user.id,
+      name: `${form.name} (Duplicado)`, // Renombrar el formulario duplicado
+      description: form.description,
+      content: form.content, // Copiar el contenido del formulario original
+      published: false, // El formulario duplicado comienza como no publicado
+    },
+  });
+
+  return duplicatedForm;
+}
+
+export async function UpdateForm(formId: number, data: { name: string; description: string }) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+
+  return prisma.form.update({
+    where: {
+      id: formId,
+      userId: user.id,
+    },
+    data: {
+      name: data.name,
+      description: data.description,
+    },
+  });
+}
+
+
+export async function DeleteForm(formId: number) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+
+  // Eliminar todos los envíos asociados al formulario
+  await prisma.formSubmission.deleteMany({
+    where: {
+      formId: formId,
+    },
+  });
+
+  // Luego eliminar el formulario
+  return prisma.form.delete({
+    where: {
+      id: formId,
+      userId: user.id,
+    },
+  });
+}

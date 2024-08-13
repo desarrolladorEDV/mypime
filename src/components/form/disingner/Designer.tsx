@@ -28,9 +28,9 @@ function Designer() {
 
   useEffect(() => {
     const sum = elements.reduce((acc, element) => {
-      if (element.type === "NumericSelectField" && element.value !== undefined) {
-        return acc + element.value;
-      }
+     // if (element.type === "NumericSelectField" && element.value !== undefined) {
+     //   return acc + element.value;
+     // }
       return acc;
     }, 0);
     setTotal(sum);
@@ -168,7 +168,7 @@ function Designer() {
                 <DesignerElementWrapper key={element.id} element={element} />
               ))}
                <div className="p-4 w-full">
-          <p className="text-xl">Total Sum: {total}</p>
+        
         </div>
             </div>
           )}
