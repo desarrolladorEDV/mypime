@@ -25,10 +25,7 @@ function FormSubmitComponent({
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
-    console.log("Initial values:", initialValues);
-    calculateTotals(initialValues); // Calcula los totales iniciales solo una vez al montar
-  }, [initialValues]);
+
 
   const calculateTotals = useCallback(
     (values: { [key: string]: string }) => {
@@ -74,6 +71,12 @@ function FormSubmitComponent({
     },
     [content]
   );
+    // Cálculo de los totales iniciales
+    useEffect(() => {
+      console.log("Initial values:", initialValues);
+      calculateTotals(initialValues); // Calcula los totales iniciales solo una vez al montar
+    }, [initialValues, calculateTotals]);
+    
 
   const validateForm = useCallback(() => {
     const errors: { [key: string]: boolean } = {};
