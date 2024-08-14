@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 const type: ElementsType = "SubTitleField";
 
 const extraAttributes = {
-  title: "Titulo",
+  title: "Subtítulo",
 };
 
 const propiertiesSchema = z.object({

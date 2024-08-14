@@ -266,7 +266,7 @@ function DesignerComponent({
   const element = elementInstance as CustomInstance;
   const { label, helperText, required, placeHolder, identifier } = element.extraAttributes;
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-2 w-full p-3">
       <Label className="font-medium text-sm">
         {label}
         {required && "*"}
@@ -307,7 +307,7 @@ function FormComponent({
   const { label, helperText, required, placeHolder, identifier } = element.extraAttributes;
   
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-2 w-full p-3">
       <Label className={cn(error && "text-red-500")}>
         {label}
         {required && "*"}

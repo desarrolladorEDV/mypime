@@ -129,7 +129,7 @@ function DesignerComponent({
       <Label className="text-muted-foreground">
        Titulo
       
-      </Label> <p className="text-xl">{title}</p>
+      </Label> <p className="text-2xl">{title}</p>
     </div>
   );
 }
@@ -144,6 +144,6 @@ function FormComponent({
 
     const { title } = element.extraAttributes;
     return (
-      <p className="text-xl">{title}</p>
+      <p className="text-2xl">{title}</p>
     );
   }

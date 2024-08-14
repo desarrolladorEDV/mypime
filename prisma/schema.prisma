@@ -17,22 +17,21 @@ datasource db {
 }
 
 // Modelo para los formularios
+
 model Form {
   id          Int      @id @default(autoincrement())
-  userId      String 
-  createdAt   DateTime @default(now()) 
-  published   Boolean  @default(false) 
-  name        String 
+  userId      String?  // Este campo ahora es opcional para formularios globales
+  createdAt   DateTime @default(now())
+  published   Boolean  @default(false)
+  name        String
   description String   @default("")
-  content     String   @default("[]") 
+  content     String   @default("[]")
+  visits      Int      @default(0)
+  submissions Int      @default(0)
+  shareURL    String   @unique @default(uuid())
+  isGlobal    Boolean  @default(false) // Nuevo campo para identificar formularios globales
 
-  visits      Int @default(0) 
-  submissions Int @default(0) 
-
-  shareURL        String           @unique @default(uuid())  
-  FormSubmissions FormSubmission[] 
-
-  @@unique([name, userId])
+  FormSubmissions FormSubmission[]
 }
 
 model FormSubmission {
