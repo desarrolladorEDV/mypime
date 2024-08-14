@@ -7,14 +7,12 @@
 // Generador para el cliente de Prisma
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 // Fuente de datos para la base de datos PostgreSQL
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-    directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // Modelo para los formularios
