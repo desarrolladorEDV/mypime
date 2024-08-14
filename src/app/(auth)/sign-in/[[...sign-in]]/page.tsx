@@ -14,7 +14,7 @@ export default function Page() {
       
       {/* Columna de la imagen y texto promocional */}
       <div className="hidden md:block w-1/2 text-white relative">
-        <div className="absolute inset-0 bg-cover bg-center  bg-sky-500 rounded" style={{backgroundImage: "url('/img/tecno.jpeg')"}}></div>
+        <div className="absolute inset-0 bg-cover bg-center  bg-sky-500 rounded" style={{backgroundImage: "url('/image.png')"}}></div>
         <div className="relative z-10">
         </div>
       </div>
