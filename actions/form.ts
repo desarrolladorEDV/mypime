@@ -333,3 +333,57 @@ export async function DeleteForm(formId: number) {
     },
   });
 }
+
+// Nueva función para actualizar una submission
+export async function UpdateSubmission(formId: number, submissionId: number, updatedContent: any) {
+  const user = await currentUser();
+  if (!user) {
+    throw new UserNotFoundErr();
+  }
+
+  // Obtener el contenido actual de la submission
+  const existingSubmission = await prisma.formSubmission.findUnique({
+    where: { id: submissionId },
+    select: { content: true },
+  });
+
+  if (!existingSubmission) {
+    throw new Error("Submission no encontrada");
+  }
+
+  const parsedExistingContent = JSON.parse(existingSubmission.content);
+
+  // Fusionar formValues y totals actualizados con los existentes
+  const mergedFormValues = {
+    ...parsedExistingContent.formValues,  // Mantén los formValues existentes
+    ...updatedContent.formValues,  // Sobrescribe los nuevos valores
+  };
+
+  const mergedTotals = {
+    ...parsedExistingContent.totals,  // Mantén los totals existentes
+    ...updatedContent.totals,  // Sobrescribe los nuevos totals
+  };
+
+  const mergedContent = {
+    ...parsedExistingContent,
+    formValues: mergedFormValues,
+    totals: mergedTotals,  // Asegúrate de actualizar `totals`
+  };
+
+  // Actualizar la submission con los nuevos datos
+  const updatedSubmission = await prisma.formSubmission.update({
+    where: { id: submissionId },
+    data: {
+      content: JSON.stringify(mergedContent),  // Guarda el contenido actualizado
+    },
+  });
+
+  console.log("Submission actualizada correctamente en la BD:", updatedSubmission);
+
+  return updatedSubmission;
+}
+
+
+
+
+

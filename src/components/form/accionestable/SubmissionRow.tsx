@@ -7,7 +7,7 @@ import { format, formatDistance } from "date-fns"; // Asegúrate de importar est
 import { toast } from "@/components/ui/use-toast"; // Asegúrate de importar el sistema de notificaciones que estés usando
 import { EditButtonWithModal } from "./EditButton"; // Importa tu componente
  // Importa tu botón de eliminar
-import { DeleteSubmission } from "../../../../actions/form"; // Asegúrate de importar correctamente
+import { DeleteSubmission, UpdateSubmission } from "../../../../actions/form"; // Asegúrate de importar correctamente
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import EliminarButton from "./EiminarButton";
@@ -51,6 +51,25 @@ export function SubmissionRow({ row, columns, formContent, formId }: SubmissionR
     }
   };
 
+  const handleUpdate = async (updatedValues: Record<string, any>) => {
+    try {
+      await UpdateSubmission(formId, row.id, updatedValues); // Función para actualizar los datos en la base de datos
+      toast({
+        title: "Submission actualizada",
+        description: "Los datos se han actualizado correctamente.",
+      });
+      router.refresh(); // Refrescar la página después de la actualización
+    } catch (error) {
+      console.error("Error al actualizar la submission:", error);
+      toast({
+        title: "Error",
+        description: "Hubo un problema al actualizar los datos.",
+        variant: "destructive",
+      });
+    }
+  };
+
+
   return (
     <TableRow>
       {columns.map((column) => (
@@ -71,7 +90,9 @@ export function SubmissionRow({ row, columns, formContent, formId }: SubmissionR
           rowData={row}
           columns={columns}
           formContent={formContent}
-        />
+          onSubmit={handleUpdate} // Llamar a la función para actualizar datos
+          existingTotals={row.totals || {}} // Pasamos los `totals` existentes o un objeto vacío si no exist
+       />
         <EliminarButton
           submissionId={row.id}
           onDelete={handleDelete}
