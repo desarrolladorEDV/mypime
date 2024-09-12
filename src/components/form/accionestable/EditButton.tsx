@@ -43,7 +43,7 @@ export function EditButtonWithModal({
         const identifier = (element.extraAttributes as any)?.identifier || "";
         const value = parseFloat(values[element.id] || "0");
   
-        console.log(`Procesando campo: ${element.id}, Identificador: ${identifier}, Valor: ${value}`);
+        //console.log(`Procesando campo: ${element.id}, Identificador: ${identifier}, Valor: ${value}`);
   
         // Validar que el valor sea un número y diferente de 0
         if (!isNaN(value) && value !== 0) {
@@ -58,7 +58,7 @@ export function EditButtonWithModal({
           // Aumentar el contador para este identificador solo si el valor es diferente de 0
           counts[identifier] += 1;
   
-          console.log(`Total para ${identifier}: ${totalsSum[identifier]}, Conteo: ${counts[identifier]}`);
+          //console.log(`Total para ${identifier}: ${totalsSum[identifier]}, Conteo: ${counts[identifier]}`);
         }
       }
     });
@@ -95,8 +95,8 @@ export function EditButtonWithModal({
 
     try {
       await onSubmit({ formValues: updatedValues.formValues, totals }); // Enviamos `formValues` y `totals`
-      console.log("Enviando formValues actualizados:", updatedValues.formValues);
-      console.log("Enviando totals actualizados:", totals);
+      //console.log("Enviando formValues actualizados:", updatedValues.formValues);
+      //console.log("Enviando totals actualizados:", totals);
 
       toast({
         title: "Datos actualizados.",
@@ -125,50 +125,58 @@ export function EditButtonWithModal({
           <p className="text-lg font-bold text-muted-foreground">Editar respuesta</p>
         </div>
         <div className="bg-accent flex flex-col flex-grow items-center justify-center p-4 bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)] overflow-y-auto">
-          <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background h-full w-full rounded-2xl p-8 overflow-y-auto">
-            {columns.map((column) => {
-              const FormComponent =
-                FormElements[column.type as keyof typeof FormElements]?.formComponent;
+        <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background h-full w-full rounded-2xl p-8 overflow-y-auto">
+  {formContent.map((element) => {
+    // Verificar si el elemento es un campo de título o subtítulo
+    if (element.type === "TitleField") {
+      return (
+        <h1 key={element.id} className="text-2xl font-bold">
+          {element.extraAttributes?.title}
+        </h1>
+      );
+    }
 
-              if (!FormComponent) return null;
+    if (element.type === "SubTitleField") {
+      return (
+        <h2 key={element.id} className="text-xl font-semibold">
+          {element.extraAttributes?.title}
+        </h2>
+      );
+    }
 
-              const originalElement = formContent.find((el) => el.id === column.id);
+    // Renderizar otros tipos de campos como componentes de formulario
+    const FormComponent = FormElements[element.type as keyof typeof FormElements]?.formComponent;
+    if (!FormComponent) return null;
 
-              return (
-                <FormComponent
-                  key={column.id}
-                  elementInstance={{
-                    id: column.id,
-                    type: column.type as ElementsType,
-                    value: updatedValues.formValues[column.id],
-                    extraAttributes: {
-                      ...originalElement?.extraAttributes,
-                      label: column.label,
-                    },
-                  }}
-                  submitValue={(id, value) => handleValueChange(id, value)}
-                  defaultValue={updatedValues.formValues[column.id]}
-                />
-              );
-            })}
+    return (
+      <FormComponent
+        key={element.id}
+        elementInstance={element}
+        submitValue={(id, value) => handleValueChange(id, value)}
+        defaultValue={updatedValues.formValues[element.id]}
+      />
+    );
+  })}
 
-            <div className="mt-4 p-4 border-t">
-              <h2 className="text-lg font-bold">Promedios por Identificador</h2>
-              <ul>
-                {Object.entries(totals).map(([identifier, total]) => (
-                  <li key={identifier}>
-                    <span className="font-semibold">{identifier}: </span>
-                    <span>{total.toFixed(2)}</span> {/* Mostrar el promedio con 2 decimales */}
-                  </li>
-                ))}
-              </ul>
-            </div>
+  {/* Mostrar promedios por identificador */}
+  <div className="mt-4 p-4 border-t">
+    <h2 className="text-lg font-bold">Promedios por Identificador</h2>
+    <ul>
+      {Object.entries(totals).map(([identifier, total]) => (
+        <li key={identifier}>
+          <span className="font-semibold">{identifier}: </span>
+          <span>{total.toFixed(2)}</span> {/* Mostrar el promedio con 2 decimales */}
+        </li>
+      ))}
+    </ul>
+  </div>
 
-            {/* Botón de Guardar con animación mientras se envían los datos */}
-            <Button onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? <Loader className="animate-spin" /> : "Guardar cambios"}
-            </Button>
-          </div>
+  {/* Botón de Guardar con animación mientras se envían los datos */}
+  <Button onClick={handleSubmit} disabled={isLoading}>
+    {isLoading ? <Loader className="animate-spin" /> : "Guardar cambios"}
+  </Button>
+</div>
+
         </div>
       </DialogContent>
     </Dialog>

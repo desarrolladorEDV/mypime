@@ -33,9 +33,7 @@ function PreviewDialogBtn() {
               const FormComponent = FormElements[element.type].formComponent;
               return <FormComponent key={element.id} elementInstance={element} />;
             })}
-            <div className="mt-4 p-4 rounded-md">
-              <p className="text-lg font-bold">Total:</p>
-            </div>
+            
           </div>
         </div>
       </DialogContent>

@@ -32,14 +32,14 @@ function FormSubmitComponent({
       const totalsSum: { [key: string]: number } = {};
       const counts: { [key: string]: number } = {};
 
-      console.log("Calculating totals with formValues:", values);
+      //console.log("Calculating totals with formValues:", values);
 
       content.forEach((element) => {
         if (element.type === "NumberField") {
           const identifier = (element.extraAttributes as any).identifier;
           const value = parseFloat(values[element.id] || "0");
 
-          console.log(`Processing element ID: ${element.id}, value: ${value}, identifier: ${identifier}`);
+         // console.log(`Processing element ID: ${element.id}, value: ${value}, identifier: ${identifier}`);
 
           if (value !== 0) {
             // Sumar los valores y contar las entradas para cada identificador
@@ -59,11 +59,11 @@ function FormSubmitComponent({
         newTotals[identifier] = totalsSum[identifier] / counts[identifier];
       });
 
-      console.log("New averages calculated:", newTotals);
+     // console.log("New averages calculated:", newTotals);
       setTotals((prevTotals) => {
         const totalsChanged = Object.keys(newTotals).some((key) => newTotals[key] !== prevTotals[key]);
         if (totalsChanged) {
-          console.log("Updating totals state.");
+          //console.log("Updating totals state.");
           return newTotals;
         }
         return prevTotals;

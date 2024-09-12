@@ -85,7 +85,7 @@ export function SubmissionRow({ row, columns, formContent, formId }: SubmissionR
           addSuffix: true,
         })}
       </TableCell>
-      <TableCell className="flex gap-2 items-center">
+      <TableCell className="flex gap-2 items-center justify-center">
         <EditButtonWithModal
           rowData={row}
           columns={columns}

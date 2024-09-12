@@ -308,7 +308,7 @@ function FormComponent({
   
   return (
     <div className="flex flex-col gap-2 w-full p-3">
-      <Label className={cn(error && "text-red-500")}>
+      <Label className={cn("font-medium text-sm", error ? "text-red-500" : "text-gray-600")}>
         {label}
         {required && "*"}
       </Label>
