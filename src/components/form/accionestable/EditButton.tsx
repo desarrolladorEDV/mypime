@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { FormElements, FormElementInstance, ElementsType } from "@/components/form/disingner/FormElemets";
-import { ClipboardPenLine } from "lucide-react";
+import { ClipboardPenLine, Loader } from "lucide-react"; // Asegúrate de importar Loader
 import { toast } from "@/components/ui/use-toast";
 
 interface EditButtonWithModalProps {
@@ -31,35 +31,50 @@ export function EditButtonWithModal({
     formValues: rowData, // Inicializamos con los valores actuales
   });
   const [totals, setTotals] = useState<Record<string, number>>(existingTotals); // Inicializamos con los totales existentes
+  const [isLoading, setIsLoading] = useState(false); // Estado para manejar el loader
 
   // Función para calcular los totales
   const calculateTotals = useCallback((values: { [key: string]: string }) => {
-    const totalsSum: { [key: string]: number } = {};
-    const counts: { [key: string]: number } = {};
-
+    const totalsSum: { [key: string]: number } = {}; // Suma de los valores por identificador
+    const counts: { [key: string]: number } = {}; // Conteo de los campos válidos por identificador
+  
     formContent.forEach((element) => {
       if (element.type === "NumberField") {
-        const identifier = (element.extraAttributes as any).identifier;
+        const identifier = (element.extraAttributes as any)?.identifier || "";
         const value = parseFloat(values[element.id] || "0");
-
-        if (!isNaN(value)) {
+  
+        console.log(`Procesando campo: ${element.id}, Identificador: ${identifier}, Valor: ${value}`);
+  
+        // Validar que el valor sea un número y diferente de 0
+        if (!isNaN(value) && value !== 0) {
+          // Inicializar el total y el contador si aún no existen para este identificador
           if (!totalsSum[identifier]) {
             totalsSum[identifier] = 0;
             counts[identifier] = 0;
           }
+  
+          // Sumar el valor al total del identificador
           totalsSum[identifier] += value;
+          // Aumentar el contador para este identificador solo si el valor es diferente de 0
           counts[identifier] += 1;
+  
+          console.log(`Total para ${identifier}: ${totalsSum[identifier]}, Conteo: ${counts[identifier]}`);
         }
       }
     });
-
+  
+    // Crear los nuevos promedios para cada identificador
     const newTotals: { [key: string]: number } = {};
     Object.keys(totalsSum).forEach((identifier) => {
-      newTotals[identifier] = totalsSum[identifier] / counts[identifier];
+      if (counts[identifier] > 0) {
+        newTotals[identifier] = totalsSum[identifier] / counts[identifier]; // Promedio
+      }
     });
-
+  
     return newTotals;
   }, [formContent]);
+  
+  
 
   // Función para manejar el cambio de valores
   const handleValueChange = (id: string, value: string) => {
@@ -75,15 +90,27 @@ export function EditButtonWithModal({
   };
 
   // Función para manejar el envío
-  const handleSubmit = useCallback(() => {
-    onSubmit({ formValues: updatedValues.formValues, totals }); // Enviamos `formValues` y `totals`
-    console.log("Enviando formValues actualizados:", updatedValues.formValues);
-    console.log("Enviando totals actualizados:", totals);
+  const handleSubmit = useCallback(async () => {
+    setIsLoading(true); // Iniciar el loader
 
-    toast({
-      title: "Datos actualizados",
-      description: "Los datos se han actualizado correctamente.",
-    });
+    try {
+      await onSubmit({ formValues: updatedValues.formValues, totals }); // Enviamos `formValues` y `totals`
+      console.log("Enviando formValues actualizados:", updatedValues.formValues);
+      console.log("Enviando totals actualizados:", totals);
+
+      toast({
+        title: "Datos actualizados.",
+        description: "Los datos se han actualizado correctamente.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Hubo un problema al actualizar los datos.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false); // Finalizar el loader después de actualizar
+    }
   }, [updatedValues, totals, onSubmit]);
 
   return (
@@ -137,7 +164,10 @@ export function EditButtonWithModal({
               </ul>
             </div>
 
-            <Button onClick={handleSubmit}>Guardar cambios</Button>
+            {/* Botón de Guardar con animación mientras se envían los datos */}
+            <Button onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? <Loader className="animate-spin" /> : "Guardar cambios"}
+            </Button>
           </div>
         </div>
       </DialogContent>

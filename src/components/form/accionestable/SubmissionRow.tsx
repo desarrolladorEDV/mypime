@@ -55,7 +55,7 @@ export function SubmissionRow({ row, columns, formContent, formId }: SubmissionR
     try {
       await UpdateSubmission(formId, row.id, updatedValues); // Función para actualizar los datos en la base de datos
       toast({
-        title: "Submission actualizada",
+        title: "Datos actualizados.",
         description: "Los datos se han actualizado correctamente.",
       });
       router.refresh(); // Refrescar la página después de la actualización
